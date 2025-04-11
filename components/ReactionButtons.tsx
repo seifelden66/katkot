@@ -1,33 +1,43 @@
 'use client'
 import { supabase } from '@/lib/supabaseClient'
 import { useEffect, useState } from 'react'
+import { useSession } from '@/contexts/SessionContext'
+import { useRouter } from 'next/navigation'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-export default function ReactionButtons({ postId, userId }: { postId: string, userId?: string }) {
+export default function ReactionButtons({ postId }: { postId: string }) {
   const [likes, setLikes] = useState(0)
   const [dislikes, setDislikes] = useState(0)
   const [userReaction, setUserReaction] = useState<string | null>(null)
+  const session = useSession()
+  const userId = session.session?.user?.id || null
+  const router = useRouter()
 
   useEffect(() => {
     const fetchReactions = async () => {
-      const { data } = await supabase
+      // Add error handling
+      const { data, error } = await supabase
         .from('reactions')
         .select('type, user_id')
         .eq('post_id', postId)
-      
-      // Set counts
+
+      if (error) {
+        console.error('Reactions fetch error:', error)
+        return
+      }
+
       setLikes(data?.filter(r => r.type === 'like').length || 0)
       setDislikes(data?.filter(r => r.type === 'dislike').length || 0)
-      
-      // Set user's current reaction
+
       if (userId) {
         const userReaction = data?.find(r => r.user_id === userId)?.type
         setUserReaction(userReaction || null)
       }
     }
-    
+
     fetchReactions()
 
-    // Real-time updates
     const channel = supabase
       .channel('realtime-reactions')
       .on('postgres_changes', {
@@ -44,66 +54,94 @@ export default function ReactionButtons({ postId, userId }: { postId: string, us
   }, [postId, userId])
 
   const handleReaction = async (type: 'like' | 'dislike') => {
-    if (!userId) return
-    
+    if (!userId) {
+      showLoginNotification()
+      return
+    }
+
     try {
       const previousReaction = userReaction
       let newReaction: string | null = type
-      
-      // Toggle off if clicking same reaction
-      if (previousReaction === type) {
+
+      if (previousReaction) {
         await supabase
           .from('reactions')
           .delete()
-          .match({ post_id: postId, user_id: userId })
-        newReaction = null
-      } 
-      // Replace with new reaction if different
-      else {
-        await supabase
-          .from('reactions')
-          .upsert(
-            { post_id: postId, user_id: userId, type },
-            { onConflict: 'post_id,user_id' }
-          )
+          .match({
+            post_id: postId,
+            user_id: userId
+          })
       }
-      
+
+      if (previousReaction !== type) {
+        const { error } = await supabase
+          .from('reactions')
+          .insert({
+            post_id: postId,
+            type,
+            user_id: userId // User ID from session
+          })
+
+        if (!error) newReaction = type
+      } else {
+        newReaction = null
+      }
+
       // Optimistic updates
       setUserReaction(newReaction)
       setLikes(prev => {
-        if (type === 'like') {
-          return newReaction ? prev + 1 : prev - 1
-        }
+        if (type === 'like') return newReaction ? prev + 1 : prev - 1
         return previousReaction === 'like' ? prev - 1 : prev
       })
       setDislikes(prev => {
-        if (type === 'dislike') {
-          return newReaction ? prev + 1 : prev - 1
-        }
+        if (type === 'dislike') return newReaction ? prev + 1 : prev - 1
         return previousReaction === 'dislike' ? prev - 1 : prev
       })
-      
+
     } catch (error) {
       console.error('Reaction error:', error)
     }
   }
 
+  const showLoginNotification = () => {
+    toast(
+      <div className="flex flex-col">
+        <p className="mb-2">You need to be logged in to react to posts</p>
+        <button 
+          onClick={() => router.push('/auth/login')}
+          className="self-start bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
+        >
+          Sign in
+        </button>
+      </div>,
+      {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        className: "bg-white dark:bg-gray-800 text-gray-800 dark:text-white",
+      }
+    );
+  };
+
   return (
-    <div className="flex gap-4 mt-2">
-      <button 
+    <div className="relative flex gap-4 mt-2">
+      <button
         onClick={() => handleReaction('like')}
-        className={`flex items-center gap-1 ${userReaction === 'like' ? 'text-blue-600' : 'text-gray-600'}`}
-        disabled={!userId}
+        className={`flex cursor-pointer items-center gap-1 ${userReaction === 'like' ? 'text-blue-600' : 'text-gray-600'}`}
       >
         👍 {likes}
       </button>
       <button
         onClick={() => handleReaction('dislike')}
-        className={`flex items-center gap-1 ${userReaction === 'dislike' ? 'text-red-600' : 'text-gray-600'}`}
-        disabled={!userId}
+        className={`flex cursor-pointer items-center gap-1 ${userReaction === 'dislike' ? 'text-red-600' : 'text-gray-600'}`}
       >
         👎 {dislikes}
       </button>
+      <ToastContainer />
     </div>
   )
 }
