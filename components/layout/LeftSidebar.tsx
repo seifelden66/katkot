@@ -21,7 +21,6 @@ type LeftSidebarProps = {
   isMobileMenuOpen: boolean;
 }
 
-// Define the navigation link type
 type NavLink = {
   name: string;
   href: string;
@@ -29,7 +28,6 @@ type NavLink = {
   requiresAuth?: boolean;
 }
 
-// Create array of navigation links
 const navLinks: NavLink[] = [
   {
     name: 'Home',
@@ -71,19 +69,14 @@ export default function LeftSidebar({
       className={`fixed lg:sticky top-0 h-screen lg:flex flex-col w-72 border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'} z-30 transform transition-transform duration-300 ease-in-out overflow-y-auto
       ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
     >
-      <div className="flex flex-col h-full p-6">
-        {/* Updated logo section with gradient text */}
+      <div className={`flex flex-col h-full pt-20 lg:p-6  ${darkMode ? 'bg-gray-900 lg:bg-inherit' : 'bg-gray-200 lg:bg-inherit'}`}>
         <div className="hidden lg:flex items-center gap-2 mb-10">
           <span className="text-2xl font-extrabold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">Katkot</span>
         </div>
 
-        {/* Updated navigation with pill-shaped active indicators */}
         <nav className="space-y-3 mb-8">
           {navLinks.map((link, index) => {
-            // Skip links that require auth if user is not logged in
             if (link.requiresAuth && !session) return null;
-            
-            // Special styling for Create Post button
             const isCreatePost = link.name === 'Create Post';
             
             return (
@@ -105,9 +98,8 @@ export default function LeftSidebar({
           })}
         </nav>
 
-        {/* Updated footer section with card-like appearance - improved light mode */}
         <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800">
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-purple-50'} rounded-2xl p-4 shadow-sm`}>
+          <div className={`rounded-2xl p-4 shadow-sm`}>
             <UserGreeting />
 
             <div className="flex items-center mt-4 justify-between">
