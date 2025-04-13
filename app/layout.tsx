@@ -8,7 +8,7 @@ import { store } from '@/lib/store'
 import MobileHeader from '@/components/layout/MobileHeader'
 import LeftSidebar from '@/components/layout/LeftSidebar'
 import RightSidebar from '@/components/layout/RightSidebar'
-import MobileNavigation from '@/components/layout/MobileHeader'
+import MobileNavigation from '@/components/layout/MobileNavigation' 
 
 const inter = Inter({ subsets: ['latin'] })
 

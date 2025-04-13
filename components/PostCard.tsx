@@ -17,6 +17,7 @@ export const ShimmerEffect = () => (
         <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
       </div>
     </div>
+    
     <div className="space-y-2 mb-4">
       <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
       <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
@@ -173,6 +174,15 @@ export default function PostCard({ post }: { post: any }) {
         {/* Post Content */}
         <div className="mb-4">
           <p className="whitespace-pre-line">{post.content}</p>
+          
+          {post.store_name && (
+            <div className="mt-2 flex items-center text-sm text-blue-600 dark:text-blue-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <span>{post.store_name}</span>
+            </div>
+          )}
           
           {post.media_url && (
             <div className="mt-3 rounded-lg overflow-hidden">

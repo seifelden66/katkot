@@ -13,9 +13,10 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null)
   const [userPosts, setUserPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [followerCount, setFollowerCount] = useState(0)
+  const [followingCount, setFollowingCount] = useState(0)
 
   useEffect(() => {
-    // Redirect if not logged in
     if (session === null) {
       router.push('/auth/login')
       return
@@ -25,7 +26,7 @@ export default function ProfilePage() {
       if (!session?.user?.id) return
 
       setLoading(true)
-      
+
       // Fetch user profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -48,7 +49,9 @@ export default function ProfilePage() {
         .select(`
           *,
           author:profiles!user_id (full_name, avatar_url),
-          category:categories!posts_category_id_fkey (name)
+          category:categories!posts_category_id_fkey (name),
+          store_name,
+          description
         `)
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
@@ -57,6 +60,8 @@ export default function ProfilePage() {
         console.error('Error fetching posts:', postsError)
       } else {
         setUserPosts(postsData || [])
+        setFollowerCount(0)
+        setFollowingCount(0)
       }
 
       setLoading(false)
@@ -109,35 +114,106 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
-            
+
             <div className="flex-1 text-center sm:text-left">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{profile?.full_name || 'User'}</h1>
-              
+
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mb-4">
                 <div className="text-center">
                   <span className="block text-xl font-bold text-gray-900 dark:text-white">{userPosts.length}</span>
                   <span className="text-sm ">Posts</span>
                 </div>
+                <div className="text-center">
+                  <span className="block text-xl font-bold ">{followerCount}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Followers</span>
+                </div>
+                <div className="text-center">
+                  <span className="block text-xl font-bold ">{followingCount}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Following</span>
+                </div>
                 {/* Other stats */}
               </div>
-              
+
               {profile?.bio && (
                 <p className="text-gray-700 dark:text-gray-300 mb-4 max-w-lg">{profile.bio}</p>
               )}
-              
-              <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm font-medium transition-colors">
+
+              {/* <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm font-medium transition-colors">
                 Edit Profile
-              </button>
+              </button> */}
+              <Link
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 
+              text-white rounded-full text-sm font-medium transition-colors"
+                key={session?.user?.id} href='profile/edit'>Edit Profile</Link>
             </div>
           </div>
         </div>
       </div>
-      
+
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Posts</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Post grid items */}
-      </div>
+
+      {userPosts.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {userPosts.map(post => (
+            <Link key={post.id} href={`/posts/${post.id}`}>
+              <div className="rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                {post.media_url && (
+                  <div className="h-48 overflow-hidden">
+                    <Image
+                      src={post.media_url}
+                      alt="Post image"
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="p-4">
+                  {post.store_name && (
+                    <div className="flex items-center mb-2">
+                      <span className="font-semibold text-blue-600 dark:text-blue-400">
+                        {post.store_name}
+                      </span>
+                      <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs">
+                        Store
+                      </span>
+                    </div>
+                  )}
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+                    {new Date(post.created_at).toLocaleDateString()}
+                    {post.category && (
+                      <span className="ml-2 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full text-xs">
+                        {post.category.name}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-gray-800 dark:text-gray-200 line-clamp-3">{post.content}</p>
+                  
+                  {post.description && (
+                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                      <div className="rich-content line-clamp-2 text-sm text-gray-600 dark:text-gray-300">
+                        {post.description.includes('<img') || post.description.includes('<video') ? (
+                          <span>Rich media content available...</span>
+                        ) : (
+                          post.description
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className=" rounded-xl shadow-sm  p-8 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+          </svg>
+          <h3 className="text-lg font-medium  mb-2">No posts yet</h3>
+          <p className="text-gray-500 dark:text-gray-400">This user hasn't created any posts yet.</p>
+        </div>
+      )}
     </div>
   )
 }

@@ -6,9 +6,12 @@ import { useSession } from '@supabase/auth-helpers-react'
 import { supabase } from '@/lib/supabaseClient'
 import PostCard from '@/components/PostCard'
 import { ShimmerEffect } from '@/components/PostCard'
+import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
+  const router = useRouter()
   const selectedCategory = useSelector((state: RootState) => state.filter.selectedCategory)
+  const selectedStore = useSelector((state: RootState) => state.filter.selectedStore)
   const [posts, setPosts] = useState<any[]>([])
   const [allReactions, setAllReactions] = useState<Record<string, any[]>>({})
   const [loading, setLoading] = useState(true)
@@ -45,13 +48,21 @@ export default function HomePage() {
       if (selectedCategory) {
         query = query.eq('category_id', selectedCategory)
       }
+      
+      if (selectedStore) {
+        query = query.eq('store_id', selectedStore)
+      }
 
       const { data, error } = await query
       if (!error) setPosts(data || [])
       setLoading(false)
     }
     fetchPosts()
-  }, [selectedCategory])
+  }, [selectedCategory, selectedStore])
+
+  const handlePostClick = (postId: string) => {
+    router.push(`/posts/${postId}`)
+  }
 
   return (
     <div className="space-y-6">
@@ -64,12 +75,17 @@ export default function HomePage() {
       ) : posts.length > 0 ? (
         <div className="space-y-6">
           {posts.map((post) => (
-            <PostCard
+            <div 
               key={post.id}
-              post={post}
-              session={session}
-              reactions={allReactions[post.id] || []}
-            />
+              onClick={() => handlePostClick(post.id)}
+              className="cursor-pointer transition-transform hover:scale-[1.01] focus:outline-none"
+            >
+              <PostCard
+                post={post}
+                session={session}
+                reactions={allReactions[post.id] || []}
+              />
+            </div>
           ))}
         </div>
       ) : (

@@ -1,6 +1,7 @@
 'use client'
 import { SearchIcon } from '@/components/icons/Icons'
 import CategoryFilter from '../CategoryFilter'
+import StoreFilter from '../StoreFilter'
 
 export default function RightSidebar() {
   return (
@@ -19,12 +20,17 @@ export default function RightSidebar() {
       </div>
       
       <div className="mb-8">
-        <h3 className="text-lg font-semibold mb-4 ">Discover</h3>
+        <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
         <CategoryFilter />
       </div>
       
-      <div className=" rounded-2xl p-5 shadow-sm mb-8">
-        <h3 className="text-lg font-semibold mb-4 ">Trending Topics</h3>
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4">Filter by Store</h3>
+        <StoreFilter />
+      </div>
+      
+      <div className="rounded-2xl p-5 shadow-sm mb-8">
+        <h3 className="text-lg font-semibold mb-4">Trending Topics</h3>
         <div className="space-y-5">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-start hover:bg-white dark:hover:bg-gray-700 p-3 rounded-xl transition-colors cursor-pointer">
@@ -40,8 +46,8 @@ export default function RightSidebar() {
         </div>
       </div>
       
-      <div className=" rounded-2xl p-5 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 ">Who to Follow</h3>
+      <div className="rounded-2xl p-5 shadow-sm">
+        <h3 className="text-lg font-semibold mb-4">Who to Follow</h3>
         <div className="space-y-5">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center justify-between">

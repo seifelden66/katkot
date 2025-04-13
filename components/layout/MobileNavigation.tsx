@@ -22,7 +22,7 @@ export default function MobileNavigation({ session }: MobileNavigationProps) {
         </Link>
 
         {session && (
-          <Link href="/create-post" className="flex flex-col items-center justify-center -mt-6">
+          <Link href="/posts/create" className="flex flex-col items-center justify-center -mt-6">
             <div className="bg-blue-500 p-3 rounded-full text-white">
               <CreateIcon />
             </div>
