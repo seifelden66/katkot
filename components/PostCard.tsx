@@ -186,6 +186,7 @@ export default function PostCard({ post }: { post: any }) {
           
           {post.media_url && (
             <div className="mt-3 rounded-lg overflow-hidden">
+              <Link href={`/posts/${post.id}`}>
               <Image
                 src={post.media_url}
                 width={800}
@@ -193,6 +194,7 @@ export default function PostCard({ post }: { post: any }) {
                 alt="Post media content"
                 className="w-full h-auto object-cover max-h-[500px]"
               />
+              </Link>
             </div>
           )}
         </div>

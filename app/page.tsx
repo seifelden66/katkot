@@ -77,7 +77,7 @@ export default function HomePage() {
           {posts.map((post) => (
             <div 
               key={post.id}
-              onClick={() => handlePostClick(post.id)}
+              // onClick={() => handlePostClick(post.id)}
               className="cursor-pointer transition-transform hover:scale-[1.01] focus:outline-none"
             >
               <PostCard
