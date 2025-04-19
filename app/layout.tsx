@@ -1,4 +1,4 @@
-'use client' // Ensure this is at the very top
+'use client' 
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { SessionProvider, useSession } from '@/contexts/SessionContext'

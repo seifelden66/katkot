@@ -10,19 +10,20 @@ export default function Register() {
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
   const router = useRouter()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setMessage('')
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          // Use camelCase for metadata fields
           fullName: fullName
         }
       }
@@ -32,7 +33,6 @@ export default function Register() {
       setError(error.message)
       setLoading(false)
     } else if (data.user) {
-      // Create profile entry with proper user reference
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
@@ -42,7 +42,7 @@ export default function Register() {
         })
 
       if (profileError) {
-        setError('Failed to create profile: ' + profileError.message)
+        setMessage('Confirm your email and try again.')
       } else {
         router.push('/dashboard')
       }
@@ -99,6 +99,7 @@ export default function Register() {
         </Link>
       </p>
 
+      {message && <p className="text-center text-sm mt-2 text-blue-500">{message}</p>}
       {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
     </div>
   )
