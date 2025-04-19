@@ -1,84 +1,69 @@
-'use client' 
-import './globals.css'
-import { Inter } from 'next/font/google'
-import { SessionProvider, useSession } from '@/contexts/SessionContext'
-import { useState, useEffect } from 'react'
-import { Provider } from 'react-redux'
-import { store } from '@/lib/store'
-import MobileHeader from '@/components/layout/MobileHeader'
-import LeftSidebar from '@/components/layout/LeftSidebar'
-import RightSidebar from '@/components/layout/RightSidebar'
-import MobileNavigation from '@/components/layout/MobileNavigation' 
-
-const inter = Inter({ subsets: ['latin'] })
-
-function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { session, logout } = useSession()
-  const [darkMode, setDarkMode] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme')
-    if (savedTheme) setDarkMode(savedTheme === 'dark')
-  }, [])
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode)
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light')
-  }, [darkMode])
-
-  return (
-    <body
-      className={`${inter.className} transition-colors duration-300`}
-      suppressHydrationWarning={true}
-    >
-      <div className="min-h-screen flex flex-col">
-        <MobileHeader 
-          darkMode={darkMode} 
-          setDarkMode={setDarkMode} 
-          isMobileMenuOpen={isMobileMenuOpen} 
-          setIsMobileMenuOpen={setIsMobileMenuOpen} 
-        />
-
-        <div className="flex flex-row w-full pt-14 lg:pt-0">
-          <LeftSidebar 
-            session={session} 
-            logout={logout} 
-            darkMode={darkMode} 
-            setDarkMode={setDarkMode} 
-            isMobileMenuOpen={isMobileMenuOpen} 
-          />
-
-          <main className="flex-1 w-full max-w-full lg:max-w-3xl mx-auto  min-h-screen">
-            <div className="sticky top-14 lg:top-0 z-20 backdrop-blur-md  px-4 py-4">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Home</h1>
-            </div>
-            <div className="p-4">
-              {children}
-            </div>
-          </main>
-
-          <div className="hidden xl:block xl:w-96 flex-shrink-0">
-            <RightSidebar />
-          </div>
-        </div>
-
-        <MobileNavigation session={session} />
-        
-        <div className="h-16 lg:hidden"></div>
-      </div>
-    </body>
-  )
+// app/layout.tsx
+export const metadata = {
+  title: {
+    template: 'Katkot',
+    default: 'Katkot - Discover and Share Amazing Products',
+  },
+  favicon: {
+    rel: 'icon',
+    type: 'image/x-icon',
+    sizes: 'any',
+    href: '/logo1.png'
+  },
+  description: 'Join Katkot to discover, share, and discuss amazing products with a community of like-minded people.',
+  keywords: ['product discovery', 'social sharing', 'product recommendations', 'community', 'shopping', 'reviews'],
+  openGraph: {
+    title: 'Katkot - Discover and Share Amazing Products',
+    description: 'Join Katkot to discover, share, and discuss amazing products with a community of like-minded people.',
+    url: 'https://katkot.com',
+    siteName: 'Katkot',
+    images: [
+      {
+        url: '/logo1.png',
+        width: 1200,
+        height: 630,
+        alt: 'Katkot - Social Product Discovery',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/logo1.png',
+    shortcut: '/logo1.png',
+  },
+  manifest: '/manifest.json',
+  alternates: {
+    canonical: 'https://katkot.com',
+    languages: {
+      'en-US': 'https://katkot.com/en-US',
+    },
+  },
+  authors: [
+    { name: 'Katkot Team', url: 'https://katkot.com/about' }
+  ],
+  category: 'Social Shopping',
+  metadataBase: new URL('https://katkot.com'),
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <Provider store={store}>
-        <SessionProvider>
-          <LayoutContent>{children}</LayoutContent>
-        </SessionProvider>
-      </Provider>
-    </html>
-  )
+import './globals.css'
+import ClientLayout from './ClientLayout'
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return <ClientLayout>{children}</ClientLayout>
 }
