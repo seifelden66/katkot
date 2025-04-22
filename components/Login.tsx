@@ -1,6 +1,7 @@
 'use client'
 import { supabase } from '@/lib/supabaseClient'
 import { useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Cookies from 'js-cookie'
@@ -11,6 +12,9 @@ export default function Login() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const router = useRouter()
+    const locale = useLocale()
+    const t = useTranslations('auth');
+    const isRTL = locale === 'ar';
 
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -31,7 +35,7 @@ export default function Login() {
                 secure: true,
                 sameSite: 'Lax'
             })
-            router.push('/')
+            router.push('/'+locale+'/')
         }
     }
 
@@ -49,13 +53,13 @@ export default function Login() {
     }
 
     return (
-        <>
+        <div dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="space-y-4">
                 <form onSubmit={handleEmailLogin} className="space-y-4">
                     <div>
                         <input
                             type="email"
-                            placeholder="Email"
+                            placeholder={t('email')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full p-2 border rounded"
@@ -65,7 +69,7 @@ export default function Login() {
                     <div>
                         <input
                             type="password"
-                            placeholder="Password"
+                            placeholder={t('password')}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full p-2 border rounded"
@@ -77,7 +81,7 @@ export default function Login() {
                         disabled={loading}
                         className="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
                     >
-                        {loading ? 'loading' : 'Sign In'}
+                        {loading ? t('loading') : t('signIn')}
                     </button>
                 </form>
 
@@ -86,7 +90,7 @@ export default function Login() {
                         <div className="w-full border-t border-gray-300"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                        <span className="px-2 bg-white text-gray-500">{t('orContinueWith')}</span>
                     </div>
                 </div>
 
@@ -101,19 +105,19 @@ export default function Login() {
                             <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
                             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
                         </svg>
-                        <span>Google</span>
+                        <span className={isRTL ? 'mr-2' : ''}>{t('google')}</span>
                     </button>
                 </div>
 
                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             </div>
 
-            <p className="text-center text-sm text-gray-600">
-                Don't have an account?{' '}
-                <Link href="/auth/register" className="text-blue-600 hover:underline">
-                    Sign up
+            <p className="text-center text-sm text-gray-600 mt-4">
+                {t('dontHaveAccount')}{' '}
+                <Link href={`/${locale}/auth/register`} className="text-blue-600 hover:underline">
+                    {t('signUp')}
                 </Link>
             </p>
-        </>
+        </div>
     )
 }

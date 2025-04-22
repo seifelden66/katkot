@@ -1,5 +1,7 @@
 'use client'
 import { supabase } from '@/lib/supabaseClient'
+import { useLocale } from 'next-intl';
+
 import { useEffect, useState } from 'react'
 import { useSession } from '@/contexts/SessionContext'
 import { useRouter } from 'next/navigation'
@@ -13,6 +15,7 @@ export default function ReactionButtons({ postId }: { postId: string }) {
   const session = useSession()
   const userId = session.session?.user?.id || null
   const router = useRouter()
+  const locale = useLocale();
 
   useEffect(() => {
     const fetchReactions = async () => {
@@ -108,7 +111,7 @@ export default function ReactionButtons({ postId }: { postId: string }) {
       <div className="flex flex-col">
         <p className="mb-2">You need to be logged in to react to posts</p>
         <button 
-          onClick={() => router.push('/auth/login')}
+          onClick={() => router.push(locale+'/auth/login')}
           className="self-start bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
         >
           Sign in

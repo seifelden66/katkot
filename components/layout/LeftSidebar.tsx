@@ -1,7 +1,10 @@
 'use client'
 import Link from 'next/link'
 import UserGreeting from '@/components/UserGreeting'
-import { Session } from '@supabase/supabase-js'
+import { useSession } from '@/contexts/SessionContext'
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+
 import { 
   HomeIcon, 
   ExploreIcon, 
@@ -14,8 +17,6 @@ import {
 
 
 type LeftSidebarProps = {
-  session: Session | null;
-  logout: () => void;
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   isMobileMenuOpen: boolean;
@@ -58,18 +59,32 @@ const navLinks: NavLink[] = [
 ];
 
 export default function LeftSidebar({ 
-  session, 
-  logout, 
   darkMode, 
   setDarkMode, 
   isMobileMenuOpen 
 }: LeftSidebarProps) {
+  const locale = useLocale();
+  const { session, logout } = useSession()  
+
+  const router = useRouter();
+  const t = useTranslations('sidebar');
+  
+  const toggleLanguage = () => {
+    const newLocale = locale === 'en' ? 'ar' : 'en';
+    localStorage.setItem('preferredLocale', newLocale);
+    const currentPath = window.location.pathname.replace(/^\/(en|ar)/, '');
+    router.push(`/${newLocale}${currentPath}`);
+  };
+
+  const isRTL = locale === 'ar';
+
   return (
     <aside
       className={`fixed lg:sticky top-0 h-screen lg:flex flex-col w-72 border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'} z-30 transform transition-transform duration-300 ease-in-out overflow-y-auto
       ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className={`flex flex-col h-full pt-20 lg:p-6  ${darkMode ? 'bg-gray-900 lg:bg-inherit' : 'bg-gray-200 lg:bg-inherit'}`}>
+      <div className={`flex flex-col h-full pt-20 lg:p-6 ${darkMode ? 'bg-gray-900 lg:bg-inherit' : 'bg-gray-200 lg:bg-inherit'}`}>
         <div className="hidden lg:flex items-center gap-2 mb-10">
           <span className="text-2xl font-extrabold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">Katkot</span>
         </div>
@@ -82,7 +97,7 @@ export default function LeftSidebar({
             return (
               <Link
                 key={index}
-                href={link.href}
+                href={`/${locale}${link.href}`}
                 className={
                   isCreatePost 
                     ? "flex items-center px-5 py-3 mt-6 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md"
@@ -92,7 +107,9 @@ export default function LeftSidebar({
                 <div className={isCreatePost ? '' : `${darkMode ? 'bg-gray-800' : 'bg-purple-100'} p-2 rounded-full`}>
                   {link.icon}
                 </div>
-                <span className={`text-base font-medium ${isCreatePost ? 'ml-3' : 'ml-4'}`}>{link.name}</span>
+                <span className={`text-base font-medium ${isCreatePost ? 'ml-3' : 'ml-4'} ${isRTL ? 'mr-4 ml-0' : ''}`}>
+                  {t(`nav.${link.name.toLowerCase().replace(' ', '_')}`)}
+                </span>
               </Link>
             );
           })}
@@ -110,29 +127,39 @@ export default function LeftSidebar({
                 {darkMode ? (
                   <>
                     <SunIcon />
-                    <span className="ml-2">Light</span>
+                    <span className={`${isRTL ? 'mr-2' : 'ml-2'}`}>{t('theme.light')}</span>
                   </>
                 ) : (
                   <>
                     <MoonIcon />
-                    <span className="ml-2">Dark</span>
+                    <span className={`${isRTL ? 'mr-2' : 'ml-2'}`}>{t('theme.dark')}</span>
                   </>
                 )}
               </button>
 
+              <button
+                onClick={toggleLanguage}
+                className="px-4 py-2 text-sm text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-full transition-colors shadow-sm"
+              >
+                {locale === 'en' ? 'العربية' : 'English'}
+              </button>
+            </div>
+            
+            <div className="flex items-center mt-3 justify-between">
+              {/* {session?.user.email} */}
               {session ? (
                 <button
                   onClick={logout}
                   className="px-4 py-2 text-sm text-white bg-red-400 hover:bg-red-500 rounded-full transition-colors shadow-sm"
                 >
-                  Logout
+                  {t('auth.signOut')}
                 </button>
               ) : (
                 <Link
-                  href="/auth/login"
+                  href={`/${locale}/auth/login`}
                   className="px-4 py-2 text-sm text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-full transition-colors shadow-sm"
                 >
-                  Login
+                  {t('auth.signIn')}
                 </Link>
               )}
             </div>

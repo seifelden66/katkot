@@ -4,6 +4,7 @@ import { useSession } from '@/contexts/SessionContext'
 import { supabase } from '@/lib/supabaseClient'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useLocale } from 'next-intl';
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
 
@@ -15,10 +16,11 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [followerCount, setFollowerCount] = useState(0)
   const [followingCount, setFollowingCount] = useState(0)
+  const locale = useLocale();
 
   useEffect(() => {
     if (session === null) {
-      router.push('/auth/login')
+      router.push(locale+'/auth/login')
       return
     }
 
@@ -144,7 +146,7 @@ export default function ProfilePage() {
               <Link
                 className="px-6 py-2 bg-blue-600 hover:bg-blue-700 
               text-white rounded-full text-sm font-medium transition-colors"
-                key={session?.user?.id} href='profile/edit'>Edit Profile</Link>
+                key={session?.user?.id} href={`${locale}/profile/edit`}>Edit Profile</Link>
             </div>
           </div>
         </div>
@@ -155,7 +157,7 @@ export default function ProfilePage() {
       {userPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {userPosts.map(post => (
-            <Link key={post.id} href={`/posts/${post.id}`}>
+            <Link key={post.id} href={`${locale}/posts/${post.id}`}>
               <div className="rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                 {post.media_url && (
                   <div className="h-48 overflow-hidden">

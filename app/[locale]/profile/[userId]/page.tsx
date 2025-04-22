@@ -6,6 +6,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
 import { useSession } from '@/contexts/SessionContext'
+import { useLocale } from 'next-intl';
+
 
 export default function UserProfilePage() {
   const params = useParams()
@@ -18,6 +20,7 @@ export default function UserProfilePage() {
   const [isFollowing, setIsFollowing] = useState(false)
   const [followerCount, setFollowerCount] = useState(0)
   const [followingCount, setFollowingCount] = useState(0)
+  const locale = useLocale()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -79,7 +82,7 @@ export default function UserProfilePage() {
         <div className="flex flex-col">
           <p className="mb-2">You need to be logged in to follow users</p>
           <Link 
-            href="/auth/login"
+            href={`${locale}/auth/login`}
             className="self-start bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
           >
             Sign in
@@ -134,7 +137,7 @@ export default function UserProfilePage() {
           <h2 className="text-xl font-bold  mb-2">User not found</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-4">The user you're looking for doesn't exist or has been removed.</p>
           <Link 
-            href="/"
+            href={`/${locale}/`}
             className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md inline-flex items-center"
           >
             Back to Home
@@ -209,7 +212,7 @@ export default function UserProfilePage() {
       {userPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {userPosts.map(post => (
-            <Link key={post.id} href={`/posts/${post.id}`}>
+            <Link key={post.id} href={`${locale}/posts/${post.id}`}>
               <div className=" rounded-xl shadow-sm  overflow-hidden hover:shadow-md transition-shadow">
                 {post.media_url && (
                   <div className="h-48 overflow-hidden">

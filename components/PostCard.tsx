@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactionButtons from './ReactionButtons'
 import { useSession } from '@/contexts/SessionContext'
 import Image from 'next/image'
+import { useLocale } from 'next-intl';
+
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns';
 
@@ -70,6 +72,7 @@ const CommentItem = ({ comment }: { comment: any }) => (
 
 export default function PostCard({ post }: { post: any }) {
   const { session } = useSession()  
+  const locale = useLocale();
   const userId = session?.user?.id
   const [comment, setComment] = useState('')
   const [comments, setComments] = useState<any[]>([])
@@ -138,7 +141,7 @@ export default function PostCard({ post }: { post: any }) {
       <div className="p-4">
         {/* Post Header */}
         <div className="flex items-center gap-3 mb-3">
-          <Link href={`/profile/${post.user_id}`}>
+          <Link href={`${locale}/profile/${post.user_id}`}>
             {post.author?.avatar_url ? (
               <Image 
                 src={post.author.avatar_url}
@@ -154,7 +157,7 @@ export default function PostCard({ post }: { post: any }) {
             )}
           </Link>
           <div>
-            <Link href={`/profile/${post.user_id}`} className="font-medium  hover:underline">
+            <Link href={`${locale}/profile/${post.user_id}`} className="font-medium  hover:underline">
               {post.author?.full_name}
             </Link>
             <div className="flex items-center gap-2 text-sm ">
@@ -162,7 +165,7 @@ export default function PostCard({ post }: { post: any }) {
               {post.category && (
                 <>
                   <span>•</span>
-                  <Link href={`/category/${post.category_id}`} className="transition-colors">
+                  <Link href={`${locale}/category/${post.category_id}`} className="transition-colors">
                     {post.category?.name}
                   </Link>
                 </>
@@ -186,14 +189,24 @@ export default function PostCard({ post }: { post: any }) {
           
           {post.media_url && (
             <div className="mt-3 rounded-lg overflow-hidden">
-              <Link href={`/posts/${post.id}`}>
-              <Image
-                src={post.media_url}
-                width={800}
-                height={600}
-                alt="Post media content"
-                className="w-full h-auto object-cover max-h-[500px]"
-              />
+              <Link href={`/${locale}/posts/${post.id}`}>
+                {/* Replace Image component with a regular img tag for external URLs */}
+                {post.media_url.includes('bing.com') ? (
+                  <img 
+                    src={post.media_url} 
+                    alt="Post media content"
+                    className="w-full h-auto object-cover max-h-[500px]"
+                  />
+                ) : (
+                  <Image
+                    src={post.media_url}
+                    width={800}
+                    height={600}
+                    alt="Post media content"
+                    className="w-full h-auto object-cover max-h-[500px]"
+                    unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
+                  />
+                )}
               </Link>
             </div>
           )}
@@ -281,7 +294,7 @@ export default function PostCard({ post }: { post: any }) {
               ) : (
                 <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    <Link href="/auth/login" className="text-purple-500 dark:text-purple-400 hover:underline">Sign in</Link> to leave a comment
+                    <Link href={`${locale}/auth/login`} className="text-purple-500 dark:text-purple-400 hover:underline">Sign in</Link> to leave a comment
                   </p>
                 </div>
               )}

@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { toast } from 'react-toastify'
+import { useLocale } from 'next-intl';
+
 
 export default function EditProfilePage() {
   const { session } = useSession()
@@ -17,11 +19,12 @@ export default function EditProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState('')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const locale = useLocale();
 
   useEffect(() => {
     // Redirect if not logged in
     if (session === null) {
-      router.push('/auth/login')
+      router.push(locale+'/auth/login')
       return
     }
 

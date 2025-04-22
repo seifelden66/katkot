@@ -2,10 +2,13 @@
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useSession } from '@/contexts/SessionContext'
+import { useLocale } from 'next-intl';
+
 export default function AboutPage() {
   const router = useRouter()
   // const { session, logout } = useSession()
   const { session } = useSession()
+  const locale = useLocale();
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -97,7 +100,7 @@ export default function AboutPage() {
         <p className="mt-4 text-gray-500 dark:text-gray-400">
           Already have an account?{' '}
           <button 
-            onClick={() => router.push('/auth/login')}
+            onClick={() => router.push(locale+'/auth/login')}
             className="text-purple-600 dark:text-purple-400 hover:underline"
           >
             Sign in

@@ -1,0 +1,54 @@
+{
+  "hello": "مرحبا",
+  "sidebar": {
+    "nav": {
+      "home": "الرئيسية",
+      "explore": "استكشاف",
+      "notifications": "الإشعارات",
+      "profile": "الملف الشخصي",
+      "create_post": "إنشاء منشور"
+    },
+    "theme": {
+      "light": "فاتح",
+      "dark": "داكن"
+    },
+   
+    "search": {
+      "placeholder": "ابحث في كتكوت"
+    },
+    "filters": {
+      "category": "تصفية حسب الفئة",
+      "store": "تصفية حسب المتجر"
+    },
+    "auth": {
+      "login": "Login",
+      "logout": "Logout",
+      "signIn": "تسجيل الدخول",
+      "signOut": "تسجيل الخروج"
+    },
+    "trending": {
+      "title": "المواضيع الرائجة",
+      "topic": "موضوع رائج",
+      "posts": "منشورات"
+    },
+    "follow": {
+      "title": "اقتراحات للمتابعة",
+      "username": "اسم المستخدم",
+      "button": "متابعة"
+    }
+},
+"auth": {
+    "email": "الايميل",
+    "password": "الرقم العام",
+    "fullName": "الاسم كامل",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل خروج",
+    "signUp": "إنشاء حساب",
+    "loading": "جاري التحميل",
+    "createAccount": "إنشاء حساب جديد",
+    "orContinueWith": "أو قم بالتسجيل باستخدام",
+    "dontHaveAccount": "لا يوجد لديك حساب؟",
+    "alreadyHaveAccount": "هل لديك حساب؟",
+    "google": "جوجل"
+  }
+}

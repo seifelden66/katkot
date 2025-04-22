@@ -1,0 +1,54 @@
+{
+    "hello": "Hello",
+    "sidebar": {
+        "nav": {
+            "home": "Home",
+            "explore": "Explore",
+            "notifications": "Notifications",
+            "profile": "Profile",
+            "create_post": "Create Post"
+        },
+        "theme": {
+            "light": "Light",
+            "dark": "Dark"
+        },
+        "auth": {
+            "login": "Login",
+            "logout": "Logout",
+            "signIn": "Sign In",
+            "signUp": "Sign Up",
+            "signOut": "Sign Out"
+        },
+        "search": {
+            "placeholder": "Search Katkot"
+        },
+        "filters": {
+            "category": "Filter by Category",
+            "store": "Filter by Store"
+        },
+        "trending": {
+            "title": "Trending Topics",
+            "topic": "Trending Topic",
+            "posts": "posts"
+        },
+        "follow": {
+            "title": "Who to Follow",
+            "username": "User Name",
+            "button": "Follow"
+        }
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Password",
+        "fullName": "Full Name",
+        "signIn": "Sign In",
+        "signUp": "Sign Up",
+        "signOut": "Sign Out",
+        "loading": "Loading",
+        "createAccount": "Create Account",
+        "orContinueWith": "Or continue with",
+        "dontHaveAccount": "Don't have an account?",
+        "alreadyHaveAccount": "Already have an account?",
+        "google": "Google"
+    }
+}
