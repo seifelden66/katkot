@@ -37,7 +37,6 @@ export default function PostPage() {
   const postId = params?.id as string
   const locale = useLocale()
 
-  // Fetch post data
   const {
     data: post,
     isLoading: isPostLoading,

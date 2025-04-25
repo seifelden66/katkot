@@ -87,13 +87,26 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
           user_id: userId,
           content
         })
-        .select()
+        .select('*, profiles(*)')  // Add profiles data to the returned comment
       
       if (error) throw error
-      return data
+      return data[0]  // Return the first comment since we're inserting one
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['comments', variables.postId] })
+    onSuccess: (newComment, variables) => {
+      // Update the comments in the cache
+      queryClient.setQueryData(['comments', variables.postId], (oldComments: any[] = []) => {
+        return [...oldComments, newComment]
+      })
+
+      // Also update the comments in the posts list
+      queryClient.setQueryData(['comments'], (oldData: Record<string, any[]> = {}) => {
+        const updatedComments = { ...oldData }
+        if (!updatedComments[variables.postId]) {
+          updatedComments[variables.postId] = []
+        }
+        updatedComments[variables.postId] = [...updatedComments[variables.postId], newComment]
+        return updatedComments
+      })
     }
   })
   
