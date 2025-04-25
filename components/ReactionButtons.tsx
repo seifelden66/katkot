@@ -19,7 +19,6 @@ export default function ReactionButtons({ postId }: { postId: string }) {
 
   useEffect(() => {
     const fetchReactions = async () => {
-      // Add error handling
       const { data, error } = await supabase
         .from('reactions')
         .select('type, user_id')

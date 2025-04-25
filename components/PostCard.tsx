@@ -1,13 +1,13 @@
 'use client'
-import { supabase } from '@/lib/supabaseClient'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback } from 'react'
 import ReactionButtons from './ReactionButtons'
 import { useSession } from '@/contexts/SessionContext'
 import Image from 'next/image'
-import { useLocale } from 'next-intl';
-
+import { useLocale } from 'next-intl'
 import Link from 'next/link'
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabaseClient'
 
 // Shimmer effect component for loading state
 export const ShimmerEffect = () => (
@@ -44,23 +44,25 @@ export const ShimmerEffect = () => (
 );
 
 const CommentItem = ({ comment }: { comment: any }) => (
+  console.log(comment),
+  
   <div className="flex items-start gap-3 p-3 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-    {comment.user?.avatar_url ? (
+    {comment.profiles?.avatar_url ? (
       <Image
-        src={comment.user.avatar_url}
-        alt={`${comment.user.full_name}'s avatar`}
+        src={comment.profiles.avatar_url}
+        alt={`${comment.profiles.full_name}'s avatar`}
         width={36}
         height={36}
         className="w-9 h-9 rounded-full object-cover"
       />
     ) : (
       <div className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-        {comment.user?.full_name?.charAt(0) || '?'}
+        {comment.profiles?.full_name?.charAt(0) || '?'}
       </div>
     )}
     <div className="flex-1">
       <div className="flex items-center gap-2">
-        <span className="font-medium ">{comment.user?.full_name}</span>
+        <span className="font-medium ">{comment.profiles?.full_name}</span>
         <span className="text-xs text-gray-500 dark:text-gray-400">
           {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
         </span>
@@ -70,67 +72,41 @@ const CommentItem = ({ comment }: { comment: any }) => (
   </div>
 );
 
-export default function PostCard({ post }: { post: any }) {
+export default function PostCard({ post, comments = [] }: { post: any, comments?: any[] }) {
   const { session } = useSession()  
   const locale = useLocale();
   const userId = session?.user?.id
-  const [comment, setComment] = useState('')
-  const [comments, setComments] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isCommenting, setIsCommenting] = useState(false)
-  const [showAllComments, setShowAllComments] = useState(false)
-  const [commentsExpanded, setCommentsExpanded] = useState(false)
+  const queryClient = useQueryClient()
   
-  useEffect(() => {
-    fetchComments()
-  }, [post?.id]) 
-
-  const fetchComments = async () => {
-    if (!post?.id) return
-    
-    setIsLoading(true)
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*, user:profiles(full_name, avatar_url)')
-      .eq('post_id', post.id)
-      .order('created_at', { ascending: true })
-    
-    if (!error) setComments(data || [])
-    setIsLoading(false)
-  }
-
-  const handleComment = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!comment.trim() || !userId) return
-    
-    setIsCommenting(true)
-    
-    const { error } = await supabase
-      .from('comments')
-      .insert({
-        post_id: post.id,
-        content: comment,
-        user_id: userId
-      })
-    
-    if (!error) {
-      setComment('')
-      await fetchComments()
+  const { mutate: addComment, isPending: isCommenting } = useMutation({
+    mutationFn: async ({ postId, userId, content }: { postId: string, userId: string, content: string }) => {
+      const { data, error } = await supabase
+        .from('comments')
+        .insert({
+          post_id: postId,
+          user_id: userId,
+          content
+        })
+        .select()
+      
+      if (error) throw error
+      return data
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['comments', variables.postId] })
     }
-    
-    setIsCommenting(false)
-  }, [comment, post?.id, userId]);
+  })
   
-  const displayedComments = useMemo(() => {
-    const commentsToShow = showAllComments ? comments : comments.slice(0, 2)
-    return commentsToShow.map(c => (
-      <CommentItem key={c.id} comment={c} />
-    ))
-  }, [comments, showAllComments]);
-
-  if (isLoading) {
-    return <ShimmerEffect />
-  }
+  const handleComment = useCallback((e: React.FormEvent, content: string) => {
+    e.preventDefault()
+    if (!content.trim() || !userId || !post?.id) return
+    
+    addComment({
+      postId: post.id,
+      userId,
+      content
+    })
+  }, [post?.id, userId, addComment])
 
   const formattedDate = post?.created_at 
     ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
@@ -157,10 +133,10 @@ export default function PostCard({ post }: { post: any }) {
             )}
           </Link>
           <div>
-            <Link href={`${locale}/profile/${post.user_id}`} className="font-medium  hover:underline">
+            <Link href={`${locale}/profile/${post.user_id}`} className="font-medium hover:underline">
               {post.author?.full_name}
             </Link>
-            <div className="flex items-center gap-2 text-sm ">
+            <div className="flex items-center gap-2 text-sm">
               <span>{formattedDate}</span>
               {post.category && (
                 <>
@@ -212,93 +188,73 @@ export default function PostCard({ post }: { post: any }) {
           )}
         </div>
 
-        {/* Reactions */}
         <ReactionButtons postId={post.id} />
         
-        {/* Comments Section */}
-        <div className="mt-4 pt-3 ">
-          <button 
-            onClick={() => setCommentsExpanded(!commentsExpanded)}
-            className="flex cursor-pointer items-center justify-between w-full mb-3"
-          >
-            <h4 className="font-medium ">
-              Comments ({comments.length})
-            </h4>
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className={`h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform ${commentsExpanded ? 'rotate-180' : ''}`} 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+        <div className="mt-4 pt-3">
+          <h4 className="font-medium mb-3">
+            Comments ({comments.length})
+          </h4>
           
           {/* Comments List */}
-          {commentsExpanded && (
-            <>
-              <div className="space-y-1">
-                {displayedComments}
-              </div>
-              
-              {comments.length > 2 && (
-                <button 
-                  onClick={() => setShowAllComments(!showAllComments)}
-                  className="text-sm text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300 mt-2"
-                >
-                  {showAllComments ? 'Show less' : `Show all ${comments.length} comments`}
-                </button>
-              )}
-              
-              {/* Comment Form */}
-              {session ? (
-                <form onSubmit={handleComment} className="mt-3 pt-2">
-                  <div className="flex gap-3">
-                    {session.user?.user_metadata?.avatar_url ? (
-                      <Image
-                        src={session.user.user_metadata.avatar_url}
-                        alt="Your avatar"
-                        width={36}
-                        height={36}
-                        className="w-9 h-9 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                        {session.user?.user_metadata?.full_name?.charAt(0) || '?'}
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <input
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        placeholder="Write a comment..."
-                        className="w-full p-3 bg-gray-100 dark:bg-gray-700 border-none rounded-full  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                      <div className="flex justify-end mt-2">
-                        <button 
-                          type="submit" 
-                          disabled={isCommenting || !comment.trim()}
-                          className={`px-4 py-2 rounded-full text-sm font-medium ${
-                            isCommenting || !comment.trim()
-                              ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white'
-                          } transition-colors`}
-                        >
-                          {isCommenting ? 'Posting...' : 'Post Comment'}
-                        </button>
-                      </div>
-                    </div>
+          <div className="space-y-1">
+            {comments.map(comment => (
+              <CommentItem key={comment.id} comment={comment} />
+            ))}
+          </div>
+          
+          {/* Comment Form */}
+          {session ? (
+            <form 
+              onSubmit={(e) => {
+                const form = e.target as HTMLFormElement;
+                const commentInput = form.elements.namedItem('comment') as HTMLInputElement;
+                handleComment(e, commentInput.value);
+                commentInput.value = '';
+              }} 
+              className="mt-3 pt-2"
+            >
+              <div className="flex gap-3">
+                {session.user?.user_metadata?.avatar_url ? (
+                  <Image
+                    src={session.user.user_metadata.avatar_url}
+                    alt="Your avatar"
+                    width={36}
+                    height={36}
+                    className="w-9 h-9 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                    {session.user?.user_metadata?.full_name?.charAt(0) || '?'}
                   </div>
-                </form>
-              ) : (
-                <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    <Link href={`${locale}/auth/login`} className="text-purple-500 dark:text-purple-400 hover:underline">Sign in</Link> to leave a comment
-                  </p>
+                )}
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    name="comment"
+                    placeholder="Add a comment..."
+                    className="w-full py-2 px-4 bg-gray-100 dark:bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isCommenting}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-purple-500 hover:bg-purple-600 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </button>
                 </div>
-              )}
-            </>
+              </div>
+            </form>
+          ) : (
+            <div className="mt-3 pt-2 text-center">
+              <Link
+                href={`/${locale}/auth/login`}
+                className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 font-medium"
+              >
+                Sign in to comment
+              </Link>
+            </div>
           )}
         </div>
       </div>

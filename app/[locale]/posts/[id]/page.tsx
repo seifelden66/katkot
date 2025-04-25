@@ -1,14 +1,17 @@
 'use client'
 import { useParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
 import PostCard from '@/components/PostCard'
-import { useEffect, useState, useCallback } from 'react'
-// import RichContent from '@/components/RichContent'
+import { useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabaseClient'
 import { Post, Profile } from '@/types/post'
+import { useLocale } from 'next-intl'
+
 interface Store {
   id: string;
   name: string;
   description?: string;
+  website?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -31,129 +34,114 @@ interface PostWithAuthor extends Post {
 export default function PostPage() {
   const params = useParams()
   const router = useRouter()
-  const [post, setPost] = useState<PostWithAuthor | null>(null)
-  const [comments, setComments] = useState<(Comment & { profiles: Profile })[]>([])
-  const [store, setStore] = useState<Store | null>(null)
-  const [nextPostId, setNextPostId] = useState<string | null>(null)
-  const [prevPostId, setPrevPostId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const postId = params?.id as string
+  const locale = useLocale()
 
-  // Memoize fetch functions to prevent recreating on each render
-  const fetchNextPostId = useCallback(async (currentId: string): Promise<string | null> => {
-    try {
+  // Fetch post data
+  const {
+    data: post,
+    isLoading: isPostLoading,
+    error: postError
+  } = useQuery({
+    queryKey: ['post', postId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*, profiles(*)')
+        .eq('id', postId)
+        .single()
+
+      if (error) throw error
+      return data as PostWithAuthor
+    },
+    enabled: !!postId
+  })
+
+  // Fetch store data if post has store_id
+  const {
+    data: store
+  } = useQuery({
+    queryKey: ['store', post?.store_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('stores')
+        .select('*')
+        .eq('id', post?.store_id)
+        .single()
+
+      if (error) throw error
+      return data as Store
+    },
+    enabled: !!post?.store_id
+  })
+
+  const {data: comments = []} = useQuery({
+    queryKey: ['comments', postId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*, profiles(*)')
+        .eq('post_id', postId)
+
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!postId
+  })
+
+  // Fetch next post ID
+  const {
+    data: nextPostId
+  } = useQuery({
+    queryKey: ['nextPost', postId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('posts')
         .select('id')
-        .gt('id', currentId)
+        .gt('id', postId)
         .order('id', { ascending: true })
         .limit(1)
-      
+
       if (error) throw error
       return data && data.length > 0 ? data[0].id : null
-    } catch (err) {
-      console.error('Error fetching next post:', err)
-      return null
-    }
-  }, [])
+    },
+    enabled: !!postId
+  })
 
-  const fetchPreviousPostId = useCallback(async (currentId: string): Promise<string | null> => {
-    try {
+  const {
+    data: prevPostId
+  } = useQuery({
+    queryKey: ['prevPost', postId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('posts')
         .select('id')
-        .lt('id', currentId)
+        .lt('id', postId)
         .order('id', { ascending: false })
         .limit(1)
-      
+
       if (error) throw error
       return data && data.length > 0 ? data[0].id : null
-    } catch (err) {
-      console.error('Error fetching previous post:', err)
-      return null
-    }
-  }, [])
-  
-  useEffect(() => {
-    const fetchPost = async () => {
-      setLoading(true)
-      setError(null)
-      
-      try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('*, profiles(*)')
-          .eq('id', params?.id)
-          .single()
-        
-        if (error) throw error
-        setPost(data)
-        
-        if (data?.store_id) {
-          const { data: storeData, error: storeError } = await supabase
-            .from('stores')
-            .select('*')
-            .eq('id', data.store_id)
-            .single()
-          
-          if (storeError) throw storeError
-          setStore(storeData)
-        }
-        
-        const currentId = params?.id as string
-        if (currentId) {
-          const [nextId, prevId] = await Promise.all([
-            fetchNextPostId(currentId),
-            fetchPreviousPostId(currentId)
-          ])
-          setNextPostId(nextId)
-          setPrevPostId(prevId)
-        }
-      } catch (err: any) {
-        console.error('Error fetching post:', err)
-        setError(err.message || 'Failed to load post')
-      } finally {
-        setLoading(false)
-      }
-    }
-    
-    const fetchComments = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('comments')
-          .select('*, profiles(*)')
-          .eq('post_id', params?.id)
-        
-        if (error) throw error
-        setComments(data || [])
-      } catch (err) {
-        console.error('Error fetching comments:', err)
-      }
-    }
-    
-    fetchPost()
-    fetchComments()
-  }, [params?.id, fetchNextPostId, fetchPreviousPostId])
-  
-  // Memoize navigation function
-  const navigateToPost = useCallback((postId: string | null) => {
-    if (postId && !loading) {
-      setLoading(true)
-      router.push(`/posts/${postId}`)
-    }
-  }, [loading, router])
+    },
+    enabled: !!postId
+  })
 
-  // Render loading state
-  if (loading && !post) return <PostSkeleton />
-  
-  // Render error state
-  if (error) {
+  const navigateToPost = useCallback((postId: string | null) => {
+    if (postId && !isPostLoading) {
+      router.push(`/${locale}/posts/${postId}`)
+    }
+  }, [isPostLoading, router, locale])
+
+  if (isPostLoading) return <PostSkeleton />
+
+  if (postError) {
+    const errorMessage = (postError as Error).message || 'Failed to load post'
     return (
       <div className="max-w-3xl mx-auto py-8 px-4 text-center">
         <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
           <h3 className="text-lg font-medium text-red-800 dark:text-red-200">Error loading post</h3>
-          <p className="mt-2 text-red-700 dark:text-red-300">{error}</p>
-          <button 
+          <p className="mt-2 text-red-700 dark:text-red-300">{errorMessage}</p>
+          <button
             onClick={() => router.push('/')}
             className="mt-4 px-4 py-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded-md hover:bg-red-200 dark:hover:bg-red-700"
           >
@@ -163,7 +151,7 @@ export default function PostPage() {
       </div>
     )
   }
-  
+
   // Render no post state
   if (!post) return <div className="max-w-3xl mx-auto py-8 px-4">Post not found</div>
 
@@ -173,12 +161,11 @@ export default function PostPage() {
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => navigateToPost(prevPostId)}
-          disabled={!prevPostId || loading}
-          className={`flex items-center px-4 py-2 rounded-full transition-all ${
-            prevPostId
+          disabled={!prevPostId || isPostLoading}
+          className={`flex items-center px-4 py-2 rounded-full transition-all ${prevPostId
               ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
               : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
-          }`}
+            }`}
           aria-label="Previous post"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -186,15 +173,14 @@ export default function PostPage() {
           </svg>
           Previous Post
         </button>
-        
+
         <button
           onClick={() => navigateToPost(nextPostId)}
-          disabled={!nextPostId || loading}
-          className={`flex items-center px-4 py-2 rounded-full transition-all ${
-            nextPostId
+          disabled={!nextPostId || isPostLoading}
+          className={`flex items-center px-4 py-2 rounded-full transition-all ${nextPostId
               ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
               : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
-          }`}
+            }`}
           aria-label="Next post"
         >
           Next Post
@@ -203,8 +189,9 @@ export default function PostPage() {
           </svg>
         </button>
       </div>
-      
-      <PostCard post={post} />
+
+      <PostCard post={post} comments={comments} />
+
       {store && (
         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <h3 className="text-lg font-medium mb-2 flex items-center">
@@ -228,7 +215,7 @@ export default function PostPage() {
           )}
         </div>
       )}
-      
+
       {post.description && (
         <div className="mt-6">
           <h3 className="text-lg font-medium mb-2">Description</h3>
@@ -245,32 +232,30 @@ export default function PostPage() {
           </div>
         </div>
       )}
-      
+
       {/* Bottom navigation buttons */}
       <div className="flex justify-between items-center mt-8">
         <button
           onClick={() => navigateToPost(prevPostId)}
-          disabled={!prevPostId || loading}
-          className={`flex items-center px-4 py-2 rounded-full transition-all ${
-            prevPostId
+          disabled={!prevPostId || isPostLoading}
+          className={`flex items-center px-4 py-2 rounded-full transition-all ${prevPostId
               ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
               : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
-          }`}
+            }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
           </svg>
           Previous Post
         </button>
-        
+
         <button
           onClick={() => navigateToPost(nextPostId)}
-          disabled={!nextPostId || loading}
-          className={`flex items-center px-4 py-2 rounded-full transition-all ${
-            nextPostId
+          disabled={!nextPostId || isPostLoading}
+          className={`flex items-center px-4 py-2 rounded-full transition-all ${nextPostId
               ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
               : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
-          }`}
+            }`}
         >
           Next Post
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">

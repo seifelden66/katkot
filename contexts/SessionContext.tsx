@@ -1,51 +1,68 @@
-'use client'
-import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-import type { Session } from '@supabase/supabase-js'
+'use client';
 
-type SessionContextType = {
-  session: Session | null
-  isLoading: boolean
-  logout: () => Promise<void>
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { Session } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabaseClient';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+interface SessionContextType {
+  session: Session | null;
+  isLoading: boolean;
+  signOut: () => Promise<void>;
+  refreshSession: () => void;
 }
 
 const SessionContext = createContext<SessionContextType>({
   session: null,
   isLoading: true,
-  logout: async () => {}
-})
+  signOut: async () => {},
+  refreshSession: () => {},
+});
 
-export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+export const useSession = () => useContext(SessionContext);
 
+export function SessionProvider({ children }: { children: ReactNode }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // Use TanStack Query to fetch and manage session
+  const { data: session, refetch } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+    initialData: null,
+  });
+
+  // Set up auth state change listener
   useEffect(() => {
-    const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setIsLoading(false)
-    }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        queryClient.setQueryData(['session'], session);
+        setIsLoading(false);
+      }
+    );
 
-    fetchSession()
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [queryClient]);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setIsLoading(false)
-    })
+  // Sign out function
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    queryClient.setQueryData(['session'], null);
+  };
 
-    return () => subscription?.unsubscribe()
-  }, [])
-
-  const logout = async () => {
-    await supabase.auth.signOut()
-    setSession(null)
-  }
+  // Function to manually refresh session
+  const refreshSession = () => {
+    refetch();
+  };
 
   return (
-    <SessionContext.Provider value={{ session, isLoading, logout }}>
+    <SessionContext.Provider value={{ session, isLoading, signOut, refreshSession }}>
       {children}
     </SessionContext.Provider>
-  )
+  );
 }
-
-export const useSession = () => useContext(SessionContext)
