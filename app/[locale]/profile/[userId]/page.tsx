@@ -6,104 +6,197 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
 import { useSession } from '@/contexts/SessionContext'
-import { useLocale } from 'next-intl';
+import { useLocale } from 'next-intl'
+import { useQuery } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 
+const fetchUserProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+const fetchUserPosts = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      author:profiles!user_id (full_name, avatar_url),
+      category:categories!posts_category_id_fkey (name)
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
 
 export default function UserProfilePage() {
+  const queryClient = useQueryClient()
   const params = useParams()
   const userId = params.userId as string
   const { session } = useSession()
   const currentUserId = session?.user?.id
-  const [profile, setProfile] = useState<any>(null)
-  const [userPosts, setUserPosts] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isFollowing, setIsFollowing] = useState(false)
-  const [followerCount, setFollowerCount] = useState(0)
-  const [followingCount, setFollowingCount] = useState(0)
   const locale = useLocale()
 
+  // Use React Query hooks
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error: profileError
+  } = useQuery({
+    queryKey: ['profile', userId],
+    queryFn: () => fetchUserProfile(userId),
+    enabled: !!userId
+  })
+
+  const {
+    data: userPosts = [],
+    isLoading: isPostsLoading,
+    error: postsError
+  } = useQuery({
+    queryKey: ['userPosts', userId],
+    queryFn: () => fetchUserPosts(userId),
+    enabled: !!userId
+  })
+
+  // Handle errors
   useEffect(() => {
-    const fetchUserData = async () => {
-      setLoading(true)
-      
-      try {
-        // Fetch user profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .single()
+    if (profileError) {
+      toast.error('Failed to load user profile')
+    }
+    if (postsError) {
+      toast.error('Failed to load user posts')
+    }
+  }, [profileError, postsError])
 
-        if (profileError) {
-          throw profileError
+  const { data: followerCount = 0 } = useQuery({
+    queryKey: ['follower-count', userId],
+    queryFn: async () => {
+      if (!userId) return 0
+
+      const { count, error } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('following_id', userId)
+
+      if (error) throw error
+      return count || 0
+    },
+    enabled: !!userId
+  })
+
+  // Following Count Query
+  const { data: followingCount = 0 } = useQuery({
+    queryKey: ['following-count', userId],
+    queryFn: async () => {
+      if (!userId) return 0
+
+      const { count, error } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('follower_id', userId)
+
+      if (error) throw error
+      return count || 0
+    },
+    enabled: !!userId
+  })
+  const { data: isFollowing = false } = useQuery({
+    queryKey: ['isFollowing', userId, currentUserId],
+    queryFn: async () => {
+      if (!currentUserId || !userId) return false
+
+      const { data, error } = await supabase
+        .from('follows')
+        .select('*')
+        .eq('follower_id', currentUserId)
+        .eq('following_id', userId)
+        .single()
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return false // No record found
         }
-
-        setProfile(profileData)
-
-        // Fetch user posts
-        const { data: postsData, error: postsError } = await supabase
-          .from('posts')
-          .select(`
-            *,
-            author:profiles!user_id (full_name, avatar_url),
-            category:categories!posts_category_id_fkey (name)
-          `)
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false })
-
-        if (postsError) {
-          console.error('Error fetching posts:', postsError)
-        } else {
-          setUserPosts(postsData || [])
-        }
-
-        // For future implementation: fetch follower/following counts
-        setFollowerCount(0)
-        setFollowingCount(0)
-        
-        // For future implementation: check if current user is following this user
-        setIsFollowing(false)
-      } catch (error) {
-        console.error('Error fetching user data:', error)
-        toast.error('Failed to load user profile')
-      } finally {
-        setLoading(false)
+        throw error
       }
-    }
-
-    if (userId) {
-      fetchUserData()
-    }
-  }, [userId])
+      return !!data
+    },
+    enabled: !!currentUserId && !!userId && currentUserId !== userId
+  })
 
   const handleFollow = async () => {
     if (!currentUserId) {
-      toast(
-        <div className="flex flex-col">
-          <p className="mb-2">You need to be logged in to follow users</p>
-          <Link 
-            href={`${locale}/auth/login`}
-            className="self-start bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
-          >
-            Sign in
-          </Link>
-        </div>,
-        {
-          position: "bottom-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-        }
-      )
+      toast.error('Please login to follow users')
       return
     }
 
-    // For future implementation: toggle follow status
-    setIsFollowing(!isFollowing)
-    toast.success(isFollowing ? 'Unfollowed user' : 'Following user')
+    if (currentUserId === userId) {
+      return
+    }
+
+    try {
+      if (isFollowing) {
+        // Unfollow
+        const { error } = await supabase
+          .from('follows')
+          .delete()
+          .eq('follower_id', currentUserId)
+          .eq('following_id', userId)
+
+        if (error) throw error
+
+        // Batch invalidate queries
+        await queryClient.invalidateQueries({
+          predicate: (query) => 
+            query.queryKey[0] === 'follower-count' ||
+            query.queryKey[0] === 'isFollowing'
+        })
+        
+        toast.success('Unfollowed successfully')
+      } else {
+        // Check if the relationship already exists
+        const { data: existingFollow } = await supabase
+          .from('follows')
+          .select('*')
+          .eq('follower_id', currentUserId)
+          .eq('following_id', userId)
+          .single()
+
+        if (!existingFollow) {
+          const { error } = await supabase
+            .from('follows')
+            .insert({
+              follower_id: currentUserId,
+              following_id: userId,
+              created_at: new Date().toISOString()
+            })
+
+          if (error) throw error
+
+          // Batch invalidate queries
+          await queryClient.invalidateQueries({
+            predicate: (query) => 
+              query.queryKey[0] === 'follower-count' ||
+              query.queryKey[0] === 'isFollowing'
+          })
+          
+          toast.success('Followed successfully')
+        }
+      }
+    } catch (error) {
+      console.error('Error following/unfollowing:', error)
+      toast.error('Failed to update follow status')
+    }
   }
+
+
+  const loading = isProfileLoading || isPostsLoading
 
   if (loading) {
     return (
@@ -136,7 +229,7 @@ export default function UserProfilePage() {
           </svg>
           <h2 className="text-xl font-bold  mb-2">User not found</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-4">The user you're looking for doesn't exist or has been removed.</p>
-          <Link 
+          <Link
             href={`/${locale}/`}
             className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md inline-flex items-center"
           >
@@ -154,7 +247,7 @@ export default function UserProfilePage() {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-6">
             <div>
               {profile.avatar_url ? (
-                <Image
+                <img
                   src={profile.avatar_url}
                   alt="Profile picture"
                   width={96}
@@ -185,44 +278,52 @@ export default function UserProfilePage() {
                   <span className="text-sm text-gray-500 dark:text-gray-400">Following</span>
                 </div>
               </div>
-              
               {currentUserId && currentUserId !== userId && (
                 <button
                   onClick={handleFollow}
                   className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                    isFollowing 
+                    isFollowing
                       ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600'
                       : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white'
                   }`}
                 >
-                  {isFollowing ? 'Following' : 'Follow'}
+                  {isFollowing ? 'Unfollow' : 'Follow'}
                 </button>
               )}
             </div>
           </div>
-          
+
           {profile.bio && (
             <p className="text-gray-700 dark:text-gray-300 mb-4">{profile.bio}</p>
           )}
         </div>
       </div>
-      
+
       <h2 className="text-xl font-bold  mb-4">Posts</h2>
-      
+
       {userPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {userPosts.map(post => (
-            <Link key={post.id} href={`${locale}/posts/${post.id}`}>
+            <Link key={post.id} href={`/${locale}/posts/${post.id}`}>
               <div className=" rounded-xl shadow-sm  overflow-hidden hover:shadow-md transition-shadow">
                 {post.media_url && (
                   <div className="h-48 overflow-hidden">
-                    <Image
-                      src={post.media_url}
-                      alt="Post image"
-                      width={400}
-                      height={300}
-                      className="w-full h-full object-cover"
-                    />
+                    {post.media_url.includes('bing.com') ? (
+                      <img
+                        src={post.media_url}
+                        alt="Post media content"
+                        className="w-full h-auto object-cover max-h-[500px]"
+                      />
+                    ) : (
+                      <Image
+                        src={post.media_url}
+                        width={800}
+                        height={600}
+                        alt="Post media content"
+                        className="w-full h-auto object-cover max-h-[500px]"
+                        unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
+                      />
+                    )}
                   </div>
                 )}
                 <div className="p-4">
@@ -251,4 +352,6 @@ export default function UserProfilePage() {
       )}
     </div>
   )
+
+ 
 }

@@ -48,7 +48,7 @@ const CommentItem = ({ comment }: { comment: any }) => (
   
   <div className="flex items-start gap-3 p-3 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
     {comment.profiles?.avatar_url ? (
-      <Image
+      <img
         src={comment.profiles.avatar_url}
         alt={`${comment.profiles.full_name}'s avatar`}
         width={36}
@@ -87,18 +87,15 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
           user_id: userId,
           content
         })
-        .select('*, profiles(*)')  // Add profiles data to the returned comment
-      
+        .select('*, profiles(*)')        
       if (error) throw error
-      return data[0]  // Return the first comment since we're inserting one
-    },
+      return data[0]  
+     },
     onSuccess: (newComment, variables) => {
-      // Update the comments in the cache
       queryClient.setQueryData(['comments', variables.postId], (oldComments: any[] = []) => {
         return [...oldComments, newComment]
       })
 
-      // Also update the comments in the posts list
       queryClient.setQueryData(['comments'], (oldData: Record<string, any[]> = {}) => {
         const updatedComments = { ...oldData }
         if (!updatedComments[variables.postId]) {
@@ -132,7 +129,7 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
         <div className="flex items-center gap-3 mb-3">
           <Link href={`${locale}/profile/${post.user_id}`}>
             {post.author?.avatar_url ? (
-              <Image 
+              <img 
                 src={post.author.avatar_url}
                 alt={`${post.author.full_name}'s avatar`}
                 width={44}
@@ -163,7 +160,6 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
           </div>
         </div>
         
-        {/* Post Content */}
         <div className="mb-4">
           <p className="whitespace-pre-line">{post.content}</p>
           
@@ -179,7 +175,6 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
           {post.media_url && (
             <div className="mt-3 rounded-lg overflow-hidden">
               <Link href={`/${locale}/posts/${post.id}`}>
-                {/* Replace Image component with a regular img tag for external URLs */}
                 {post.media_url.includes('bing.com') ? (
                   <img 
                     src={post.media_url} 
@@ -228,7 +223,7 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
             >
               <div className="flex gap-3">
                 {session.user?.user_metadata?.avatar_url ? (
-                  <Image
+                  <img
                     src={session.user.user_metadata.avatar_url}
                     alt="Your avatar"
                     width={36}

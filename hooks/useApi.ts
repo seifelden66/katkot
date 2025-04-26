@@ -1,40 +1,39 @@
-import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabaseClient'
 
-export const useApi = () => {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+type ApiMethod = 'POST' | 'PUT' | 'DELETE'
 
-  const request = async (endpoint: string, method: 'POST' | 'PUT' | 'DELETE', body?: object) => {
-    setLoading(true)
-    setError('')
-    
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession()
-      
-      if (!session || error) {
-        throw new Error('Not authenticated')
+interface MutationVariables {
+  table: string
+  method: ApiMethod
+  body?: Record<string, any>
+}
+
+export const useApi = () => {
+  const mutation = useMutation({
+    mutationFn: async ({ table, method, body }: MutationVariables) => {
+      let res
+      if (method === 'POST') {
+        res = await supabase.from(table).insert([body])
+      } else if (method === 'PUT') {
+        if (!body?.id) throw new Error('Missing id for update')
+        const { id, ...patch } = body
+        res = await supabase.from(table).update(patch).eq('id', id)
+      } else if (method === 'DELETE') {
+        if (!body?.id) throw new Error('Missing id for delete')
+        res = await supabase.from(table).delete().eq('id', body.id)
+      } else {
+        throw new Error('Unsupported method')
       }
 
-      const response = await fetch(`/api/${endpoint}`, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`
-        },
-        credentials: 'include', // For cookie-based sessions
-        body: JSON.stringify(body)
-      })
-
-      if (!response.ok) throw await response.json()
-      return await response.json()
-    } catch (err: any) {
-      setError(err.message || 'Request failed')
-      throw err
-    } finally {
-      setLoading(false)
+      if (res.error) throw res.error
+      return res.data
     }
-  }
+  })
 
-  return { request, loading, error }
+  return {
+    request: mutation.mutate,
+    loading: mutation.isPending,
+    error: mutation.error?.message || ''
+  }
 }

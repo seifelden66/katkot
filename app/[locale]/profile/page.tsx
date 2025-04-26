@@ -1,52 +1,41 @@
 'use client'
-import { useEffect, useState } from 'react'
 import { useSession } from '@/contexts/SessionContext'
 import { supabase } from '@/lib/supabaseClient'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useLocale } from 'next-intl';
+import { useLocale } from 'next-intl'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 
 export default function ProfilePage() {
   const { session } = useSession()
-  const router = useRouter()
-  const [profile, setProfile] = useState<any>(null)
-  const [userPosts, setUserPosts] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [followerCount, setFollowerCount] = useState(0)
-  const [followingCount, setFollowingCount] = useState(0)
-  const locale = useLocale();
+  const locale    = useLocale()
+  const userId    = session?.user?.id
 
-  useEffect(() => {
-    if (session === null) {
-      router.push(locale+'/auth/login')
-      return
-    }
-
-    const fetchProfile = async () => {
-      if (!session?.user?.id) return
-
-      setLoading(true)
-
-      // Fetch user profile
-      const { data: profileData, error: profileError } = await supabase
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
+    queryKey: ['profile', userId],
+    queryFn: async () => {
+      if (!userId) return null
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', userId)
         .single()
-
-      if (profileError) {
-        console.error('Error fetching profile:', profileError)
+      if (error) {
         toast.error('Failed to load profile')
-        setLoading(false)
-        return
+        throw error
       }
+      return data
+    },
+    enabled: !!userId,
+    refetchOnMount: 'always'
+  })
 
-      setProfile(profileData)
-
-      // Fetch user posts
-      const { data: postsData, error: postsError } = await supabase
+  const { data: userPosts = [], isLoading: isPostsLoading } = useQuery({
+    queryKey: ['user-posts', userId],
+    queryFn: async () => {
+      if (!userId) return []
+      const { data, error } = await supabase
         .from('posts')
         .select(`
           *,
@@ -55,38 +44,60 @@ export default function ProfilePage() {
           store_name,
           description
         `)
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false })
-
-      if (postsError) {
-        console.error('Error fetching posts:', postsError)
-      } else {
-        setUserPosts(postsData || [])
-        setFollowerCount(0)
-        setFollowingCount(0)
+      if (error) {
+        toast.error('Failed to load posts')
+        throw error
       }
+      return data || []
+    },
+    enabled: !!userId
+  })
 
-      setLoading(false)
-    }
+  const { data: followerCount = 0 } = useQuery({
+    queryKey: ['follower-count', userId],
+    queryFn: async () => {
+      if (!userId) return 0
+      const { count, error } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('following_id', userId)
+      if (error) throw error
+      return count || 0
+    },
+    enabled: !!userId
+  })
 
-    fetchProfile()
-  }, [session, router])
+  const { data: followingCount = 0 } = useQuery({
+    queryKey: ['following-count', userId],
+    queryFn: async () => {
+      if (!userId) return 0
+      const { count, error } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('follower_id', userId)
+      if (error) throw error
+      return count || 0
+    },
+    enabled: !!userId
+  })
 
-  if (loading) {
+  if (isProfileLoading || isPostsLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
           <div className="flex items-center gap-6 mb-8">
-            <div className="w-24 h-24 rounded-full "></div>
+            <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700"></div>
             <div className="flex-1">
-              <div className="h-6  rounded w-1/4 mb-3"></div>
-              <div className="h-4  rounded w-1/3"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-3"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
             </div>
           </div>
-          <div className="h-4  rounded w-full mb-6"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-6"></div>
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-40  rounded"></div>
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-40 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ))}
           </div>
         </div>
@@ -101,7 +112,7 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0">
               {profile?.avatar_url ? (
-                <Image
+                <img
                   src={profile.avatar_url}
                   alt={profile.full_name || 'User'}
                   width={128}
@@ -109,76 +120,67 @@ export default function ProfilePage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center ">
+                <div className="w-full h-full flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
               )}
             </div>
-
             <div className="flex-1 text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{profile?.full_name || 'User'}</h1>
-
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                {profile?.full_name || 'User'}
+              </h1>
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mb-4">
                 <div className="text-center">
                   <span className="block text-xl font-bold text-gray-900 dark:text-white">{userPosts.length}</span>
-                  <span className="text-sm ">Posts</span>
+                  <span className="text-sm">Posts</span>
                 </div>
                 <div className="text-center">
-                  <span className="block text-xl font-bold ">{followerCount}</span>
+                  <span className="block text-xl font-bold">{followerCount}</span>
                   <span className="text-sm text-gray-500 dark:text-gray-400">Followers</span>
                 </div>
                 <div className="text-center">
-                  <span className="block text-xl font-bold ">{followingCount}</span>
+                  <span className="block text-xl font-bold">{followingCount}</span>
                   <span className="text-sm text-gray-500 dark:text-gray-400">Following</span>
                 </div>
-                {/* Other stats */}
               </div>
-
               {profile?.bio && (
                 <p className="text-gray-700 dark:text-gray-300 mb-4 max-w-lg">{profile.bio}</p>
               )}
-
-              {/* <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm font-medium transition-colors">
-                Edit Profile
-              </button> */}
               <Link
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 
-              text-white rounded-full text-sm font-medium transition-colors"
-                key={session?.user?.id} href={`${locale}/profile/edit`}>Edit Profile</Link>
+                href={`/${locale}/profile/edit`}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm font-medium transition-colors"
+              >
+                Edit Profile
+              </Link>
             </div>
           </div>
         </div>
       </div>
-
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Posts</h2>
-
       {userPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {userPosts.map(post => (
-            <Link key={post.id} href={`${locale}/posts/${post.id}`}>
+            <Link key={post.id} href={`/${locale}/posts/${post.id}`}>
               <div className="rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                 {post.media_url && (
                   <div className="h-48 overflow-hidden">
-                    <Image
+                    <img
                       src={post.media_url}
-                      alt="Post image"
-                      width={400}
-                      height={300}
-                      className="w-full h-full object-cover"
+                      width={800}
+                      height={600}
+                      alt="Post media"
+                      className="w-full h-auto object-cover max-h-[500px]"
+                      unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
                     />
                   </div>
                 )}
                 <div className="p-4">
                   {post.store_name && (
                     <div className="flex items-center mb-2">
-                      <span className="font-semibold text-blue-600 dark:text-blue-400">
-                        {post.store_name}
-                      </span>
-                      <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs">
-                        Store
-                      </span>
+                      <span className="font-semibold text-blue-600 dark:text-blue-400">{post.store_name}</span>
+                      <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs">Store</span>
                     </div>
                   )}
                   <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
@@ -190,16 +192,13 @@ export default function ProfilePage() {
                     )}
                   </p>
                   <p className="text-gray-800 dark:text-gray-200 line-clamp-3">{post.content}</p>
-                  
                   {post.description && (
                     <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                      <div className="rich-content line-clamp-2 text-sm text-gray-600 dark:text-gray-300">
-                        {post.description.includes('<img') || post.description.includes('<video') ? (
-                          <span>Rich media content available...</span>
-                        ) : (
-                          post.description
-                        )}
-                      </div>
+                      {post.description.includes('<img') || post.description.includes('<video') ? (
+                        <span>Rich media content available...</span>
+                      ) : (
+                        <p className="rich-content line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{post.description}</p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -208,11 +207,11 @@ export default function ProfilePage() {
           ))}
         </div>
       ) : (
-        <div className=" rounded-xl shadow-sm  p-8 text-center">
+        <div className="rounded-xl shadow-sm p-8 text-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
           </svg>
-          <h3 className="text-lg font-medium  mb-2">No posts yet</h3>
+          <h3 className="text-lg font-medium mb-2">No posts yet</h3>
           <p className="text-gray-500 dark:text-gray-400">This user hasn't created any posts yet.</p>
         </div>
       )}

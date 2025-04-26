@@ -2,10 +2,12 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
+import { useLocale } from 'next-intl';
 import { useApi } from '@/hooks/useApi'
 import RichTextEditor from './RichTextEditor'
 
 export default function CreatePost() {
+  const locale = useLocale()
   const [content, setContent] = useState('')
   const [media_url, setMedia] = useState('')
   const [affiliateLink, setAffiliateLink] = useState('')
@@ -87,7 +89,7 @@ export default function CreatePost() {
         setError(response.error.message || 'Error creating post');
         return;
       }
-      router.push('/');
+      router.push('/'+locale+'/');
     } catch (err: any) {
       console.error('Submission error:', err);
       setError(err.message || 'An unexpected error occurred');

@@ -64,7 +64,7 @@ export default function LeftSidebar({
   isMobileMenuOpen 
 }: LeftSidebarProps) {
   const locale = useLocale();
-  const { session, logout } = useSession()  
+  const { session, signOut } = useSession()  
 
   const router = useRouter();
   const t = useTranslations('sidebar');
@@ -149,7 +149,7 @@ export default function LeftSidebar({
               {/* {session?.user.email} */}
               {session ? (
                 <button
-                  onClick={logout}
+                  onClick={signOut}
                   className="px-4 py-2 text-sm text-white bg-red-400 hover:bg-red-500 rounded-full transition-colors shadow-sm"
                 >
                   {t('auth.signOut')}

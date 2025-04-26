@@ -2,8 +2,84 @@
 import { SearchIcon } from '@/components/icons/Icons'
 import CategoryFilter from '../CategoryFilter'
 import StoreFilter from '../StoreFilter'
+import { useSession } from '@/contexts/SessionContext'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabaseClient'
+import Image from 'next/image'
+import { useLocale } from 'next-intl'
+import Link from 'next/link'
+// import { toast } from 'react-hot-toast'
 
 export default function RightSidebar() {
+  const { session } = useSession()
+  const locale = useLocale()
+  const queryClient = useQueryClient()
+  const currentUserId = session?.user?.id
+
+  // Fetch users to follow
+  const { data: usersToFollow = [] } = useQuery({
+    queryKey: ['users-to-follow'],
+    queryFn: async () => {
+      if (!currentUserId) return []
+
+      const { data: followingData } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', currentUserId)
+
+      const followingIds = followingData?.map(f => f.following_id) || []
+
+      const { data: users } = await supabase
+        .from('profiles')
+        .select('*')
+        .not('id', 'in', `(${[currentUserId, ...followingIds].join(',')})`)
+        .limit(3)
+
+      return users || []
+    },
+    enabled: !!currentUserId
+  })
+
+  const { mutate: followUser } = useMutation({
+    mutationFn: async (userId: string) => {
+      if (!currentUserId) throw new Error('Must be logged in to follow')
+
+      const { error } = await supabase
+        .from('follows')
+        .insert({
+          follower_id: currentUserId,
+          following_id: userId
+        })
+
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users-to-follow'] })
+      // toast.success('Successfully followed user')
+    },
+    onError: (error) => {
+      // toast.error('Failed to follow user: ' + error.message)
+    }
+  })
+
+  const handleFollow = (userId: string) => {
+    if (!currentUserId) {
+      // toast(
+      //   <div className="flex flex-col">
+      //     <p className="mb-2">You need to be logged in to follow users</p>
+      //     <Link 
+      //       href={`/${locale}/auth/login`}
+      //       className="self-start bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
+      //     >
+      //       Sign in
+      //     </Link>
+      //   </div>
+      // )
+      return
+    }
+    followUser(userId)
+  }
+
   return (
     <aside className="hidden xl:block p-6 sticky top-0 h-screen overflow-y-auto dark:border-gray-800">
       <div className="mb-8">
@@ -49,20 +125,43 @@ export default function RightSidebar() {
       <div className="rounded-2xl p-5 shadow-sm">
         <h3 className="text-lg font-semibold mb-4">Who to Follow</h3>
         <div className="space-y-5">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 mr-3"></div>
-                <div>
-                  <p className="font-medium ">User Name {i}</p>
-                  <p className="text-sm text-gray-500">@username{i}</p>
+          {usersToFollow.map((user) => (
+            <div key={user.id} className="flex items-center justify-between">
+              <Link href={`/${locale}/profile/${user.id}`} className="flex items-center">
+                <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                  {user.avatar_url ? (
+                    <Image
+                      src={user.avatar_url}
+                      alt={`${user.full_name}'s avatar`}
+                      width={40}
+                      height={40}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                      {user.full_name?.charAt(0) || '?'}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <button className="px-4 py-2 text-sm bg-purple-100 dark:bg-gray-700 text-purple-600 dark:text-purple-400 rounded-full font-medium hover:bg-purple-200 dark:hover:bg-gray-600 transition-colors">
+                <div>
+                  <p className="font-medium">{user.full_name}</p>
+                  <p className="text-sm text-gray-500">@{user.username || user.id.slice(0, 8)}</p>
+                </div>
+              </Link>
+              <button 
+                onClick={() => handleFollow(user.id)}
+                className="px-4 py-2 text-sm bg-purple-100 dark:bg-gray-700 text-purple-600 dark:text-purple-400 rounded-full font-medium hover:bg-purple-200 dark:hover:bg-gray-600 transition-colors"
+              >
                 Follow
               </button>
             </div>
           ))}
+          
+          {usersToFollow.length === 0 && (
+            <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+              {currentUserId ? 'No new users to follow' : 'Sign in to see suggested users'}
+            </div>
+          )}
         </div>
       </div>
     </aside>

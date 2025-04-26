@@ -79,7 +79,7 @@ export default function EditProfilePage() {
     const filePath = `avatars/${fileName}`
     
     const { error: uploadError } = await supabase.storage
-      .from('user-content')
+      .from('avatars')
       .upload(filePath, avatarFile)
     
     if (uploadError) {
@@ -89,7 +89,7 @@ export default function EditProfilePage() {
     }
     
     const { data } = supabase.storage
-      .from('user-content')
+      .from('avatars')
       .getPublicUrl(filePath)
     
     return data.publicUrl
@@ -106,7 +106,6 @@ export default function EditProfilePage() {
     setSaving(true)
     
     try {
-      // Upload avatar if changed
       let newAvatarUrl = avatarUrl
       if (avatarFile) {
         const uploadedUrl = await uploadAvatar()
@@ -115,7 +114,6 @@ export default function EditProfilePage() {
         }
       }
       
-      // Update profile
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -130,8 +128,8 @@ export default function EditProfilePage() {
         throw error
       }
       
-      toast.success('Profile updated successfully')
-      router.push('/profile')
+      // toast.success('Profile updated successfully')
+      router.push('/'+ locale + '/profile')
     } catch (error) {
       console.error('Error updating profile:', error)
       toast.error('Failed to update profile')
@@ -169,7 +167,7 @@ export default function EditProfilePage() {
           <div className="flex flex-col items-center">
             <div className="mb-4 relative">
               {avatarPreview ? (
-                <Image
+                <img
                   src={avatarPreview}
                   alt="Avatar preview"
                   width={128}
@@ -177,7 +175,7 @@ export default function EditProfilePage() {
                   className="w-32 h-32 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
                 />
               ) : avatarUrl ? (
-                <Image
+                <img
                   src={avatarUrl}
                   alt="Current avatar"
                   width={128}
