@@ -51,7 +51,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
                   <main className="flex-1 w-full max-w-full lg:max-w-3xl mx-auto min-h-screen">
                     <div className="sticky top-14 lg:top-0 z-20 backdrop-blur-md px-4 py-4">
-                      <h1 className="text-xl font-bold text-gray-900 dark:text-white">home</h1>
+                      <h1 className="text-xl font-bold text-gray-900 ">home</h1>
                     </div>
                     <div className="p-4">{children}</div>
                   </main>

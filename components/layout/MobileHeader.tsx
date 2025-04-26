@@ -28,14 +28,14 @@ export default function MobileHeader({
       <div className="flex items-center gap-3">
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+          className="p-2 rounded-full bg-gray-100 "
         >
           {darkMode ? <SunIcon /> : <MoonIcon />}
         </button>
 
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+          className="p-2 rounded-full bg-gray-100 "
         >
           {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
         </button>

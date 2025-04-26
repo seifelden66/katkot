@@ -36,7 +36,7 @@ export default function StoreFilter() {
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             selectedStore === null
               ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-sm'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              : 'bg-gray-100  text-gray-700  hover:bg-gray-200 '
           }`}
         >
           All Stores
@@ -49,7 +49,7 @@ export default function StoreFilter() {
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedStore === store.id
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-sm'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-100  text-gray-700  hover:bg-gray-200 '
             }`}
           >
             {store.name}

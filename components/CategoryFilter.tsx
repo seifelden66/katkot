@@ -40,7 +40,7 @@ export default function CategoryFilter() {
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             selectedCategory === null && selectedStore === null
               ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-sm'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              : 'bg-gray-100  text-gray-700  hover:bg-gray-200 '
           }`}
         >
           All
@@ -53,7 +53,7 @@ export default function CategoryFilter() {
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedCategory === category.id
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-sm'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-100  text-gray-700  hover:bg-gray-200 '
             }`}
           >
             {category.name}
@@ -63,7 +63,7 @@ export default function CategoryFilter() {
         {(selectedCategory !== null || selectedStore !== null) && (
           <button
             onClick={handleClearFilters}
-            className="px-4 py-2 rounded-full text-sm font-medium transition-colors bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/30"
+            className="px-4 py-2 rounded-full text-sm font-medium transition-colors bg-red-100  text-red-600  hover:bg-red-200"
           >
             Clear Filters
           </button>

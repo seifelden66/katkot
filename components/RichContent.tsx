@@ -74,7 +74,7 @@ export default function RichContent({ content }: RichContentProps) {
   return (
     <div 
       ref={contentRef} 
-      className="rich-content prose prose-sm md:prose-base dark:prose-invert max-w-none"
+      className="rich-content prose prose-sm md:prose-base  max-w-none"
     />
   )
 }

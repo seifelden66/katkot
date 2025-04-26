@@ -11,32 +11,32 @@ import { supabase } from '@/lib/supabaseClient'
 
 // Shimmer effect component for loading state
 export const ShimmerEffect = () => (
-  <div className="animate-pulse rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden p-4 mb-4">
+  <div className="animate-pulse rounded-xl shadow-sm border border-gray-200  overflow-hidden p-4 mb-4">
     <div className="flex items-center gap-3 mb-4">
-      <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+      <div className="w-12 h-12 rounded-full bg-gray-200 "></div>
       <div className="flex-1">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2"></div>
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+        <div className="h-4 bg-gray-200  rounded w-1/4 mb-2"></div>
+        <div className="h-3 bg-gray-200  rounded w-1/3"></div>
       </div>
     </div>
     
     <div className="space-y-2 mb-4">
-      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
-      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+      <div className="h-4 bg-gray-200  rounded w-full"></div>
+      <div className="h-4 bg-gray-200  rounded w-5/6"></div>
+      <div className="h-4 bg-gray-200  rounded w-3/4"></div>
     </div>
-    <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+    <div className="h-48 bg-gray-200  rounded-lg mb-4"></div>
     <div className="flex gap-4 mb-4">
-      <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-      <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+      <div className="h-8 bg-gray-200  rounded w-1/4"></div>
+      <div className="h-8 bg-gray-200  rounded w-1/4"></div>
     </div>
-    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-3"></div>
+    <div className="h-5 bg-gray-200  rounded w-1/3 mb-3"></div>
     <div className="space-y-3">
       <div className="flex gap-3">
-        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+        <div className="w-8 h-8 rounded-full bg-gray-200 "></div>
         <div className="flex-1">
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2"></div>
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+          <div className="h-3 bg-gray-200  rounded w-1/4 mb-2"></div>
+          <div className="h-3 bg-gray-200  rounded w-5/6"></div>
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@ export const ShimmerEffect = () => (
 const CommentItem = ({ comment }: { comment: any }) => (
   console.log(comment),
   
-  <div className="flex items-start gap-3 p-3 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+  <div className="flex items-start gap-3 p-3 border-b border-gray-100  hover:bg-gray-50 transition-colors">
     {comment.profiles?.avatar_url ? (
       <img
         src={comment.profiles.avatar_url}
@@ -63,11 +63,11 @@ const CommentItem = ({ comment }: { comment: any }) => (
     <div className="flex-1">
       <div className="flex items-center gap-2">
         <span className="font-medium ">{comment.profiles?.full_name}</span>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-gray-500 ">
           {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
         </span>
       </div>
-      <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">{comment.content}</p>
+      <p className="text-sm text-gray-800  mt-1">{comment.content}</p>
     </div>
   </div>
 );
@@ -164,7 +164,7 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
           <p className="whitespace-pre-line">{post.content}</p>
           
           {post.store_name && (
-            <div className="mt-2 flex items-center text-sm text-blue-600 dark:text-blue-400">
+            <div className="mt-2 flex items-center text-sm text-blue-600 ">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
@@ -240,7 +240,7 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
                     type="text"
                     name="comment"
                     placeholder="Add a comment..."
-                    className="w-full py-2 px-4 bg-gray-100 dark:bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+                    className="w-full py-2 px-4 bg-gray-100  rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 "
                   />
                   <button
                     type="submit"
@@ -258,7 +258,7 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
             <div className="mt-3 pt-2 text-center">
               <Link
                 href={`/${locale}/auth/login`}
-                className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 font-medium"
+                className="text-purple-500 hover:text-purple-600  font-medium"
               >
                 Sign in to comment
               </Link>

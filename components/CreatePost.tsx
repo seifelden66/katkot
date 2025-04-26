@@ -104,7 +104,7 @@ export default function CreatePost() {
         <select
           value={selectedCategoryId || ''}
           onChange={(e) => setSelectedCategoryId(Number(e.target.value))}
-          className="w-full p-2 border rounded  dark:border-gray-700"
+          className="w-full p-2 border rounded  "
         >
           {categories.map(category => (
             <option key={category.id} value={category.id}>
@@ -124,7 +124,7 @@ export default function CreatePost() {
             const value = e.target.value
             setSelectedStoreId(value ? Number(value) : null)
           }}
-          className="w-full p-2 border rounded  dark:border-gray-700"
+          className="w-full p-2 border rounded  "
           required
         >
           <option value="" disabled>
@@ -144,7 +144,7 @@ export default function CreatePost() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="What's on your mind?"
-          className="w-full p-2 border rounded h-32  dark:border-gray-700"
+          className="w-full p-2 border rounded h-32  "
           required
         />
       </div>
@@ -155,7 +155,7 @@ export default function CreatePost() {
           type="url"
           value={media_url}
           onChange={(e) => setMedia(e.target.value)}
-          className="w-full p-2 border rounded  dark:border-gray-700"
+          className="w-full p-2 border rounded  "
         />
       </div>
 
@@ -165,14 +165,14 @@ export default function CreatePost() {
           value={affiliateLink}
           onChange={(e) => setAffiliateLink(e.target.value)}
           placeholder="Affiliate link (optional)"
-          className="w-full p-2 border rounded  dark:border-gray-700"
+          className="w-full p-2 border rounded  "
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium mb-2">Detailed Description</label>
         <RichTextEditor onChange={setDescription} value={description} />
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-xs text-gray-500 ">
           Add rich text, images, and videos to your description
         </p>
       </div>

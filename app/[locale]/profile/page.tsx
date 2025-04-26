@@ -88,16 +88,16 @@ export default function ProfilePage() {
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
           <div className="flex items-center gap-6 mb-8">
-            <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div className="w-24 h-24 rounded-full bg-gray-200 "></div>
             <div className="flex-1">
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-3"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+              <div className="h-6 bg-gray-200  rounded w-1/4 mb-3"></div>
+              <div className="h-4 bg-gray-200  rounded w-1/3"></div>
             </div>
           </div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-6"></div>
+          <div className="h-4 bg-gray-200  rounded w-full mb-6"></div>
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-40 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div key={i} className="h-40 bg-gray-200  rounded"></div>
             ))}
           </div>
         </div>
@@ -107,10 +107,10 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">
+      <div className="rounded-xl shadow-sm border border-gray-200  overflow-hidden mb-6">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0">
+            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200  overflow-hidden flex-shrink-0">
               {profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -128,25 +128,25 @@ export default function ProfilePage() {
               )}
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-2xl font-bold text-gray-900  mb-2">
                 {profile?.full_name || 'User'}
               </h1>
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mb-4">
                 <div className="text-center">
-                  <span className="block text-xl font-bold text-gray-900 dark:text-white">{userPosts.length}</span>
+                  <span className="block text-xl font-bold text-gray-900 ">{userPosts.length}</span>
                   <span className="text-sm">Posts</span>
                 </div>
                 <div className="text-center">
                   <span className="block text-xl font-bold">{followerCount}</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Followers</span>
+                  <span className="text-sm text-gray-500 ">Followers</span>
                 </div>
                 <div className="text-center">
                   <span className="block text-xl font-bold">{followingCount}</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Following</span>
+                  <span className="text-sm text-gray-500 ">Following</span>
                 </div>
               </div>
               {profile?.bio && (
-                <p className="text-gray-700 dark:text-gray-300 mb-4 max-w-lg">{profile.bio}</p>
+                <p className="text-gray-700  mb-4 max-w-lg">{profile.bio}</p>
               )}
               <Link
                 href={`/${locale}/profile/edit`}
@@ -158,7 +158,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Posts</h2>
+      <h2 className="text-xl font-bold text-gray-900  mb-4">Posts</h2>
       {userPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {userPosts.map(post => (
@@ -179,25 +179,25 @@ export default function ProfilePage() {
                 <div className="p-4">
                   {post.store_name && (
                     <div className="flex items-center mb-2">
-                      <span className="font-semibold text-blue-600 dark:text-blue-400">{post.store_name}</span>
-                      <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs">Store</span>
+                      <span className="font-semibold text-blue-600 ">{post.store_name}</span>
+                      <span className="ml-2 px-2 py-1 bg-blue-100  text-blue-600  rounded-full text-xs">Store</span>
                     </div>
                   )}
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+                  <p className="text-gray-500  text-sm mb-2">
                     {new Date(post.created_at).toLocaleDateString()}
                     {post.category && (
-                      <span className="ml-2 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full text-xs">
+                      <span className="ml-2 px-2 py-1 bg-purple-100  text-purple-600  rounded-full text-xs">
                         {post.category.name}
                       </span>
                     )}
                   </p>
-                  <p className="text-gray-800 dark:text-gray-200 line-clamp-3">{post.content}</p>
+                  <p className="text-gray-800  line-clamp-3">{post.content}</p>
                   {post.description && (
-                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div className="mt-3 pt-3 border-t border-gray-100 ">
                       {post.description.includes('<img') || post.description.includes('<video') ? (
                         <span>Rich media content available...</span>
                       ) : (
-                        <p className="rich-content line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{post.description}</p>
+                        <p className="rich-content line-clamp-2 text-sm text-gray-600 ">{post.description}</p>
                       )}
                     </div>
                   )}
@@ -212,7 +212,7 @@ export default function ProfilePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
           </svg>
           <h3 className="text-lg font-medium mb-2">No posts yet</h3>
-          <p className="text-gray-500 dark:text-gray-400">This user hasn't created any posts yet.</p>
+          <p className="text-gray-500 ">This user hasn't created any posts yet.</p>
         </div>
       )}
     </div>

@@ -35,11 +35,11 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2 border-b border-gray-200 dark:border-gray-700 mb-4">
+    <div className="flex flex-wrap items-center gap-2 p-2 border-b border-gray-200  mb-4">
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`p-2 rounded ${editor.isActive('bold') ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+        className={`p-2 rounded ${editor.isActive('bold') ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Bold"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -50,7 +50,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`p-2 rounded ${editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+        className={`p-2 rounded ${editor.isActive('italic') ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Italic"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -62,7 +62,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={`p-2 rounded ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+        className={`p-2 rounded ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Heading 2"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -74,7 +74,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={`p-2 rounded ${editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+        className={`p-2 rounded ${editor.isActive('bulletList') ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Bullet List"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -86,7 +86,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
           <line x1="3" y1="18" x2="3.01" y2="18"></line>
         </svg>
       </button>
-      <label className="p-2 rounded bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer" title="Upload Image">
+      <label className="p-2 rounded bg-white  hover:bg-gray-100  cursor-pointer" title="Upload Image">
         <input
           type="file"
           className="hidden"
@@ -104,7 +104,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
         <button
           type="button"
           onClick={() => setShowYoutubeInput(!showYoutubeInput)}
-          className={`p-2 rounded ${showYoutubeInput ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+          className={`p-2 rounded ${showYoutubeInput ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
           title="Add YouTube Video"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -120,7 +120,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
               onChange={(e) => setYoutubeUrl(e.target.value)}
               onKeyDown={handleYoutubeInputKeyDown}
               placeholder="Enter YouTube URL"
-              className="p-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="p-1 border border-gray-300  rounded bg-white  text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               autoFocus
             />
             <button
@@ -201,19 +201,19 @@ export default function RichTextEditor({ onChange, value }: { onChange: (html: s
     },
     editorProps: {
       attributes: {
-        class: 'prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none',
+        class: 'prose  prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none',
       },
     },
   })
 
   return (
-    <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
+    <div className="border border-gray-300  rounded-lg overflow-hidden">
       <MenuBar editor={editor} onImageUpload={handleImageUpload} />
       <div className="p-4 min-h-[200px]">
         <EditorContent editor={editor} className="max-w-none" />
       </div>
       {uploading && (
-        <div className="p-2 text-center text-sm text-gray-500 dark:text-gray-400 border-t dark:border-gray-700">
+        <div className="p-2 text-center text-sm text-gray-500  border-t ">
           Uploading image...
         </div>
       )}

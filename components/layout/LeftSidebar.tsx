@@ -115,7 +115,7 @@ export default function LeftSidebar({
           })}
         </nav>
 
-        <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div className="mt-auto pt-6 border-t border-gray-200 ">
           <div className={`rounded-2xl p-4 shadow-sm`}>
             <UserGreeting />
 

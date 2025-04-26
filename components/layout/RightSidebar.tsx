@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabaseClient'
 import Image from 'next/image'
 import { useLocale } from 'next-intl'
+import { toast } from 'react-toastify'
 import Link from 'next/link'
 // import { toast } from 'react-hot-toast'
 
@@ -16,7 +17,6 @@ export default function RightSidebar() {
   const queryClient = useQueryClient()
   const currentUserId = session?.user?.id
 
-  // Fetch users to follow
   const { data: usersToFollow = [] } = useQuery({
     queryKey: ['users-to-follow'],
     queryFn: async () => {
@@ -55,10 +55,10 @@ export default function RightSidebar() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users-to-follow'] })
-      // toast.success('Successfully followed user')
+      toast.success('Successfully followed user')
     },
     onError: (error) => {
-      // toast.error('Failed to follow user: ' + error.message)
+      toast.error('Failed to follow user: ' + error.message)
     }
   })
 
@@ -81,10 +81,10 @@ export default function RightSidebar() {
   }
 
   return (
-    <aside className="hidden xl:block p-6 sticky top-0 h-screen overflow-y-auto dark:border-gray-800">
+    <aside className="hidden xl:block p-6 sticky top-0 h-screen overflow-y-auto ">
       <div className="mb-8">
         <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 ">
             <SearchIcon />
           </div>
           <input
@@ -109,7 +109,7 @@ export default function RightSidebar() {
         <h3 className="text-lg font-semibold mb-4">Trending Topics</h3>
         <div className="space-y-5">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-start hover:bg-white dark:hover:bg-gray-700 p-3 rounded-xl transition-colors cursor-pointer">
+            <div key={i} className="flex items-start hover:bg-white p-3 rounded-xl transition-colors cursor-pointer">
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 mr-3 flex items-center justify-center text-white font-bold">
                 #{i}
               </div>
@@ -150,7 +150,7 @@ export default function RightSidebar() {
               </Link>
               <button 
                 onClick={() => handleFollow(user.id)}
-                className="px-4 py-2 text-sm bg-purple-100 dark:bg-gray-700 text-purple-600 dark:text-purple-400 rounded-full font-medium hover:bg-purple-200 dark:hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 text-sm bg-purple-100  text-purple-600  rounded-full font-medium hover:bg-purple-200 transition-colors"
               >
                 Follow
               </button>
@@ -158,7 +158,7 @@ export default function RightSidebar() {
           ))}
           
           {usersToFollow.length === 0 && (
-            <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+            <div className="text-center text-gray-500  py-4">
               {currentUserId ? 'No new users to follow' : 'Sign in to see suggested users'}
             </div>
           )}

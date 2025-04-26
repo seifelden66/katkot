@@ -113,13 +113,13 @@ export default function HomePage() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-20 h-20 bg-purple-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+          <div className="w-20 h-20 bg-purple-100  rounded-full flex items-center justify-center mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No posts found</h3>
-          <p className="text-gray-500 dark:text-gray-400 max-w-md">
+          <h3 className="text-xl font-bold text-gray-900  mb-2">No posts found</h3>
+          <p className="text-gray-500  max-w-md">
             {selectedCategory 
               ? "There are no posts in this category yet. Try selecting a different category."
               : "There are no posts yet. Be the first to create one!"}

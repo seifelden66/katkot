@@ -124,7 +124,7 @@ export default function ReactionButtons({ postId }: { postId: string }) {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        className: "bg-white dark:bg-gray-800 text-gray-800 dark:text-white",
+        className: "bg-white  text-gray-800 ",
       }
     );
   };

@@ -13,4 +13,4 @@ export const MoonIcon = () => (
 )
 
 export const MenuIcon = () => (
-  <svg className="w-5 h-5 text-gray-700 dark:text-white" fill="none"
+  <svg className="w-5 h-5 text-gray-700 " fill="none"

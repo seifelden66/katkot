@@ -142,17 +142,17 @@ export default function EditProfilePage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-8"></div>
+          <div className="h-6 bg-gray-200  rounded w-1/4 mb-8"></div>
           <div className="flex flex-col md:flex-row gap-8 mb-6">
-            <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 mx-auto md:mx-0"></div>
+            <div className="w-32 h-32 rounded-full bg-gray-200  mx-auto md:mx-0"></div>
             <div className="flex-1 space-y-4">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-              <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-4 bg-gray-200  rounded w-1/3"></div>
+              <div className="h-10 bg-gray-200  rounded"></div>
+              <div className="h-4 bg-gray-200  rounded w-1/2"></div>
+              <div className="h-32 bg-gray-200  rounded"></div>
             </div>
           </div>
-          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/4 ml-auto"></div>
+          <div className="h-10 bg-gray-200  rounded w-1/4 ml-auto"></div>
         </div>
       </div>
     )
@@ -160,9 +160,9 @@ export default function EditProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Edit Profile</h1>
+      <h1 className="text-2xl font-bold text-gray-900  mb-8">Edit Profile</h1>
       
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden p-6">
+      <form onSubmit={handleSubmit} className="bg-white  rounded-xl shadow-sm border border-gray-200  overflow-hidden p-6">
         <div className="flex flex-col md:flex-row gap-8 mb-6">
           <div className="flex flex-col items-center">
             <div className="mb-4 relative">
@@ -172,7 +172,7 @@ export default function EditProfilePage() {
                   alt="Avatar preview"
                   width={128}
                   height={128}
-                  className="w-32 h-32 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
+                  className="w-32 h-32 rounded-full object-cover border-2 border-white  shadow-sm"
                 />
               ) : avatarUrl ? (
                 <img
@@ -180,15 +180,15 @@ export default function EditProfilePage() {
                   alt="Current avatar"
                   width={128}
                   height={128}
-                  className="w-32 h-32 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
+                  className="w-32 h-32 rounded-full object-cover border-2 border-white  shadow-sm"
                 />
               ) : (
-                <div className="w-32 h-32 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white text-4xl font-bold border-2 border-white dark:border-gray-700 shadow-sm">
+                <div className="w-32 h-32 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white text-4xl font-bold border-2 border-white  shadow-sm">
                   {fullName.charAt(0) || session?.user?.email?.charAt(0) || '?'}
                 </div>
               )}
             </div>
-            <label className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full cursor-pointer hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors">
+            <label className="px-4 py-2 bg-purple-100  text-purple-600  rounded-full cursor-pointer hover:bg-purple-200 transition-colors">
               Change Avatar
               <input
                 type="file"
@@ -201,7 +201,7 @@ export default function EditProfilePage() {
           
           <div className="flex-1 space-y-4">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700  mb-1">
                 Full Name
               </label>
               <input
@@ -209,13 +209,13 @@ export default function EditProfilePage() {
                 id="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full p-3 bg-gray-50  border border-gray-200  rounded-lg text-gray-900  focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Your name"
               />
             </div>
             
             <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700  mb-1">
                 Bio
               </label>
               <textarea
@@ -223,22 +223,22 @@ export default function EditProfilePage() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={5}
-                className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full p-3 bg-gray-50  border border-gray-200  rounded-lg text-gray-900  focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Tell us about yourself"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Email
               </label>
               <input
                 type="email"
                 value={session?.user?.email || ''}
                 disabled
-                className="w-full p-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                className="w-full p-3 bg-gray-100  border border-gray-200  rounded-lg text-gray-500  cursor-not-allowed"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500 ">
                 Email cannot be changed
               </p>
             </div>
@@ -249,7 +249,7 @@ export default function EditProfilePage() {
           <button
             type="button"
             onClick={() => router.push('/profile')}
-            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="px-6 py-2 border border-gray-300  text-gray-700  rounded-full hover:bg-gray-50  transition-colors"
           >
             Cancel
           </button>

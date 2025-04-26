@@ -19,11 +19,11 @@ interface Store {
 // Loading skeleton component
 const PostSkeleton = () => (
   <div className="max-w-3xl mx-auto py-8 px-4 animate-pulse">
-    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-md mb-6"></div>
-    <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
-    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6"></div>
-    <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+    <div className="h-10 bg-gray-200  rounded-md mb-6"></div>
+    <div className="h-64 bg-gray-200  rounded-lg mb-4"></div>
+    <div className="h-4 bg-gray-200  rounded w-3/4 mb-2"></div>
+    <div className="h-4 bg-gray-200  rounded w-1/2 mb-6"></div>
+    <div className="h-32 bg-gray-200  rounded-lg"></div>
   </div>
 )
 
@@ -137,12 +137,12 @@ export default function PostPage() {
     const errorMessage = (postError as Error).message || 'Failed to load post'
     return (
       <div className="max-w-3xl mx-auto py-8 px-4 text-center">
-        <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-          <h3 className="text-lg font-medium text-red-800 dark:text-red-200">Error loading post</h3>
-          <p className="mt-2 text-red-700 dark:text-red-300">{errorMessage}</p>
+        <div className="bg-red-50  p-4 rounded-lg">
+          <h3 className="text-lg font-medium text-red-800">Error loading post</h3>
+          <p className="mt-2 text-red-700 ">{errorMessage}</p>
           <button
             onClick={() => router.push('/')}
-            className="mt-4 px-4 py-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded-md hover:bg-red-200 dark:hover:bg-red-700"
+            className="mt-4 px-4 py-2 bg-red-100 text-red-800 rounded-md hover:bg-red-200 "
           >
             Return to Home
           </button>
@@ -151,19 +151,17 @@ export default function PostPage() {
     )
   }
 
-  // Render no post state
   if (!post) return <div className="max-w-3xl mx-auto py-8 px-4">Post not found</div>
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 relative">
-      {/* Navigation buttons */}
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => navigateToPost(prevPostId)}
           disabled={!prevPostId || isPostLoading}
           className={`flex items-center px-4 py-2 rounded-full transition-all ${prevPostId
-              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
-              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200   '
+              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400  '
             }`}
           aria-label="Previous post"
         >
@@ -177,8 +175,8 @@ export default function PostPage() {
           onClick={() => navigateToPost(nextPostId)}
           disabled={!nextPostId || isPostLoading}
           className={`flex items-center px-4 py-2 rounded-full transition-all ${nextPostId
-              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
-              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200   '
+              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400  '
             }`}
           aria-label="Next post"
         >
@@ -192,7 +190,7 @@ export default function PostPage() {
       <PostCard post={post} comments={comments} />
 
       {store && (
-        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <div className="mt-6 p-4 bg-blue-50  rounded-lg">
           <h3 className="text-lg font-medium mb-2 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -220,7 +218,7 @@ export default function PostPage() {
           <h3 className="text-lg font-medium mb-2">Description</h3>
           <div className="p-4 rounded-lg shadow-sm">
             <div
-              className="rich-content prose prose-sm md:prose-base dark:prose-invert max-w-none"
+              className="rich-content prose prose-sm md:prose-base max-w-none"
               dangerouslySetInnerHTML={{
                 __html: post.description
                   .replace(/<img(.+?)>/g, '<div class="my-4 overflow-hidden rounded-lg"><img$1 class="w-full h-auto object-cover" /></div>')
@@ -238,8 +236,8 @@ export default function PostPage() {
           onClick={() => navigateToPost(prevPostId)}
           disabled={!prevPostId || isPostLoading}
           className={`flex items-center px-4 py-2 rounded-full transition-all ${prevPostId
-              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
-              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200   '
+              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400  '
             }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -252,8 +250,8 @@ export default function PostPage() {
           onClick={() => navigateToPost(nextPostId)}
           disabled={!nextPostId || isPostLoading}
           className={`flex items-center px-4 py-2 rounded-full transition-all ${nextPostId
-              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40'
-              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200   '
+              : 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400  '
             }`}
         >
           Next Post
