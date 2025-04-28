@@ -13,7 +13,7 @@ import { useQueryClient } from '@tanstack/react-query'
 const fetchUserProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, regions(*)')
     .eq('id', userId)
     .single()
 
@@ -261,9 +261,18 @@ export default function UserProfilePage() {
               )}
             </div>
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-2xl font-bold  mb-1">
+              <h1 className="text-2xl font-bold mb-1">
                 {profile.full_name || 'User'}
               </h1>
+              
+              {profile.regions && (
+                <div className="mb-3">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">
+                    {profile.regions.name}
+                  </span>
+                </div>
+              )}
+              
               <div className="flex flex-wrap gap-4 justify-center md:justify-start mb-4">
                 <div className="text-center">
                   <span className="block text-xl font-bold ">{userPosts.length}</span>
@@ -352,6 +361,4 @@ export default function UserProfilePage() {
       )}
     </div>
   )
-
- 
 }

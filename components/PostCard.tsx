@@ -127,7 +127,7 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
       <div className="p-4">
         {/* Post Header */}
         <div className="flex items-center gap-3 mb-3">
-          <Link href={`${locale}/profile/${post.user_id}`}>
+          <Link href={`/${locale}/profile/${post.user_id}`}>
             {post.author?.avatar_url ? (
               <img 
                 src={post.author.avatar_url}

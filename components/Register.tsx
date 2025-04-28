@@ -16,7 +16,26 @@ export default function Register() {
   const locale = useLocale()
   const t = useTranslations('auth');
   const isRTL = locale === 'ar';
-
+  const [regions, setRegions] = useState<Array<{ id: number; name: string }>>([])
+  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) // Default to Global
+  
+  useEffect(() => {
+    const fetchRegions = async () => {
+      const { data, error } = await supabase
+        .from('regions')
+        .select('id, name')
+        .order('name', { ascending: true })
+      
+      if (error) {
+        console.error('Error fetching regions:', error)
+      } else if (data) {
+        setRegions(data)
+      }
+    }
+    
+    fetchRegions()
+  }, [])
+  
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -42,7 +61,8 @@ export default function Register() {
         .insert({
           id: data.user.id,
           full_name: fullName,
-          subscription_plan: 'free'
+          subscription_plan: 'free',
+          region_id: selectedRegionId || 1
         })
 
       if (profileError) {
@@ -53,7 +73,7 @@ export default function Register() {
       setLoading(false)
     }
   }
-
+  
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="space-y-4">
@@ -88,6 +108,23 @@ export default function Register() {
               required
             />
           </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-2">{t('region')}</label>
+            <select
+              value={selectedRegionId || 1}
+              onChange={(e) => setSelectedRegionId(Number(e.target.value))}
+              className="w-full p-2 border rounded"
+              required
+            >
+              {regions.map(region => (
+                <option key={region.id} value={region.id}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          
           <button
             type="submit"
             disabled={loading}

@@ -18,7 +18,7 @@ export default function ProfilePage() {
       if (!userId) return null
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, regions(*)')
         .eq('id', userId)
         .single()
       if (error) {
@@ -107,7 +107,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="rounded-xl shadow-sm border border-gray-200  overflow-hidden mb-6">
+      <div className="rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200  overflow-hidden flex-shrink-0">
@@ -128,9 +128,18 @@ export default function ProfilePage() {
               )}
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-gray-900  mb-2">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 {profile?.full_name || 'User'}
               </h1>
+              
+              {profile?.regions && (
+                <div className="mb-3">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">
+                    {profile.regions.name}
+                  </span>
+                </div>
+              )}
+              
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mb-4">
                 <div className="text-center">
                   <span className="block text-xl font-bold text-gray-900 ">{userPosts.length}</span>
