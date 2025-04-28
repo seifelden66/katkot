@@ -4,36 +4,48 @@ import { supabase } from '@/lib/supabaseClient'
 import PostCard from '@/components/PostCard'
 import { useQuery } from '@tanstack/react-query'
 import { useSession } from '@/contexts/SessionContext'
-import { useLocale } from 'next-intl'
+// import { useLocale } from 'next-intl'
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [selectedStore, setSelectedStore] = useState<number | null>(null)
-  const [categories, setCategories] = useState<any[]>([])
-  const [stores, setStores] = useState<any[]>([])
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
+  const [stores, setStores] = useState<{ id: number; name: string }[]>([])
   const { session } = useSession()
-  const locale = useLocale()
+  // const locale = useLocale()
 
   useEffect(() => {
     const fetchFilters = async () => {
-      // Fetch categories
-      const { data: categoriesData } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name')
-      
-      if (categoriesData) {
-        setCategories(categoriesData)
-      }
-      
-      // Fetch stores
-      const { data: storesData } = await supabase
-        .from('stores')
-        .select('*')
-        .order('name')
-      
-      if (storesData) {
-        setStores(storesData)
+      try {
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('categories')
+          .select('*')
+          .order('name')
+        
+        if (categoriesError) {
+          console.error('Error fetching categories:', categoriesError)
+          return
+        }
+        
+        if (categoriesData) {
+          setCategories(categoriesData)
+        }
+        
+        const { data: storesData, error: storesError } = await supabase
+          .from('stores')
+          .select('*')
+          .order('name')
+        
+        if (storesError) {
+          console.error('Error fetching stores:', storesError)
+          return
+        }
+        
+        if (storesData) {
+          setStores(storesData)
+        }
+      } catch (error) {
+        console.error('Error in fetchFilters:', error)
       }
     }
     
@@ -45,14 +57,19 @@ export default function HomePage() {
     queryFn: async () => {
       if (!session?.user?.id) return null
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('region_id')
-        .eq('id', session.user.id)
-        .single()
-        
-      if (error) throw error
-      return data
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('region_id')
+          .eq('id', session.user.id)
+          .single()
+          
+        if (error) throw error
+        return data
+      } catch (error) {
+        console.error('Error fetching user profile:', error)
+        return null
+      }
     },
     enabled: !!session?.user?.id
   })
@@ -60,116 +77,171 @@ export default function HomePage() {
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['posts', selectedCategory, selectedStore, userProfile?.region_id],
     queryFn: async () => {
-      // First get user's region posts
-      let userRegionPosts: any[] = []
-      let otherRegionPosts: any[] = []
-      
-      // Base query
-      let baseQuery = supabase
-        .from('posts')
-        .select(`
-          *,
-          author:profiles!user_id (full_name, avatar_url),
-          category:categories!posts_category_id_fkey (name),
-          region:regions!posts_region_id_fkey (name, code)
-        `)
-      
-      // Apply filters
-      if (selectedCategory) {
-        baseQuery = baseQuery.eq('category_id', selectedCategory)
-      }
-      
-      if (selectedStore) {
-        baseQuery = baseQuery.eq('store_id', selectedStore)
-      }
-      
-      // If user is logged in and has a region, prioritize that region's posts
-      if (session?.user?.id && userProfile?.region_id) {
-        // Get posts from user's region or global
-        const { data: regionPosts, error: regionError } = await baseQuery
-          .or(`region_id.eq.${userProfile.region_id},region_id.eq.1`) // User's region or global
-          .order('created_at', { ascending: false })
+      try {
+        let userRegionPosts: {
+          id: number;
+          user_id: string;
+          content: string;
+          created_at: string;
+          category_id: number;
+          store_id: number;
+          region_id: number;
+          author: {
+            full_name: string;
+            avatar_url: string | null;
+          };
+          category: {
+            name: string;
+          };
+          region: {
+            name: string;
+            code: string;
+          };
+        }[] = []
+        let otherRegionPosts: {
+          id: number;
+          user_id: string;
+          content: string;
+          created_at: string;
+          category_id: number;
+          store_id: number;
+          region_id: number;
+          author: {
+            full_name: string;
+            avatar_url: string | null;
+          };
+          category: {
+            name: string;
+          };
+          region: {
+            name: string;
+            code: string;
+          };
+        }[] = []
         
-        if (!regionError && regionPosts) {
-          userRegionPosts = regionPosts
+        let baseQuery = supabase
+          .from('posts')
+          .select(`
+            *,
+            author:profiles!user_id (full_name, avatar_url),
+            category:categories!posts_category_id_fkey (name),
+            region:regions!posts_region_id_fkey (name, code)
+          `)
+        
+        if (selectedCategory) {
+          baseQuery = baseQuery.eq('category_id', selectedCategory)
         }
         
-        // Get posts from other regions
-        const { data: otherPosts, error: otherError } = await baseQuery
-          .not('region_id', 'in', `(${userProfile.region_id},1)`) // Not user's region and not global
-          .order('created_at', { ascending: false })
-        
-        if (!otherError && otherPosts) {
-          otherRegionPosts = otherPosts
+        if (selectedStore) {
+          baseQuery = baseQuery.eq('store_id', selectedStore)
         }
         
-        // Combine with user's region posts first
-        return [...userRegionPosts, ...otherRegionPosts]
-      } else {
-        // If no user or no region, just get all posts
-        const { data, error } = await baseQuery.order('created_at', { ascending: false })
-        if (error) throw error
-        return data || []
+        if (session?.user?.id && userProfile?.region_id) {
+          const { data: regionPosts, error: regionError } = await baseQuery
+            .or(`region_id.eq.${userProfile.region_id},region_id.eq.1`) 
+            .order('created_at', { ascending: false })
+          
+          if (regionError) {
+            console.error('Error fetching region posts:', regionError)
+          } else if (regionPosts) {
+            userRegionPosts = regionPosts
+          }
+          
+          const { data: otherPosts, error: otherError } = await baseQuery
+            .not('region_id', 'in', `(${userProfile.region_id},1)`) 
+            .order('created_at', { ascending: false })
+          
+          if (otherError) {
+            console.error('Error fetching other region posts:', otherError)
+          } else if (otherPosts) {
+            otherRegionPosts = otherPosts
+          }
+          
+          return [...userRegionPosts, ...otherRegionPosts]
+        } else {
+          const { data, error } = await baseQuery.order('created_at', { ascending: false })
+          if (error) throw error
+          return data || []
+        }
+      } catch (error) {
+        console.error('Error fetching posts:', error)
+        return []
       }
     }
   })
 
-  // Fetch reactions for all posts
-  const { data: allReactions = {} } = useQuery({
-    queryKey: ['allReactions', posts],
+  const {  } = useQuery({
+    queryKey: ['allReactions', posts.map(post => post.id).join(',')],
     queryFn: async () => {
       if (!posts.length) return {}
       
-      const postIds = posts.map(post => post.id)
-      const { data, error } = await supabase
-        .from('reactions')
-        .select('*')
-        .in('post_id', postIds)
-      
-      if (error) throw error
-      
-      // Group reactions by post_id
-      const groupedReactions: Record<string, any[]> = {}
-      data?.forEach(reaction => {
-        if (!groupedReactions[reaction.post_id]) {
-          groupedReactions[reaction.post_id] = []
-        }
-        groupedReactions[reaction.post_id].push(reaction)
-      })
-      
-      return groupedReactions
+      try {
+        const postIds = posts.map(post => post.id)
+        const { data, error } = await supabase
+          .from('reactions')
+          .select('*')
+          .in('post_id', postIds)
+        
+        if (error) throw error
+        
+        const groupedReactions: Record<string, { id: number; post_id: number; user_id: string; type: string; created_at: string }[]> = {}
+        data?.forEach(reaction => {
+          if (!groupedReactions[reaction.post_id]) {
+            groupedReactions[reaction.post_id] = []
+          }
+          groupedReactions[reaction.post_id].push(reaction)
+        })
+        
+        return groupedReactions
+      } catch (error) {
+        console.error('Error fetching reactions:', error)
+        return {}
+      }
     },
     enabled: posts.length > 0
   })
 
-  // Fetch comments for all posts
   const { data: commentsData = {} } = useQuery({
-    queryKey: ['allComments', posts],
+    queryKey: ['allComments', posts.map(post => post.id).join(',')],
     queryFn: async () => {
       if (!posts.length) return {}
       
-      const postIds = posts.map(post => post.id)
-      const { data, error } = await supabase
-        .from('comments')
-        .select(`
-          *,
-          author:profiles!user_id (full_name, avatar_url)
-        `)
-        .in('post_id', postIds)
-        .order('created_at', { ascending: true })
-      
-      if (error) throw error
-      
-      // Group comments by post_id
-      const groupedComments: Record<string, any[]> = {}
-      data?.forEach(comment => {
-        if (!groupedComments[comment.post_id]) {
-          groupedComments[comment.post_id] = []
-        }
-        groupedComments[comment.post_id].push(comment)
-      })
-      
-      return groupedComments
+      try {
+        const postIds = posts.map(post => post.id)
+        const { data, error } = await supabase
+          .from('comments')
+          .select(`
+            *,
+            author:profiles!user_id (full_name, avatar_url)
+          `)
+          .in('post_id', postIds)
+          .order('created_at', { ascending: true })
+        
+        if (error) throw error
+        
+        const groupedComments: Record<string, {
+          id: number;
+          post_id: number;
+          user_id: string;
+          content: string;
+          created_at: string;
+          author: {
+            full_name: string;
+            avatar_url: string | null;
+          };
+        }[]> = {}
+        data?.forEach(comment => {
+          if (!groupedComments[comment.post_id]) {
+            groupedComments[comment.post_id] = []
+          }
+          groupedComments[comment.post_id].push(comment)
+        })
+        
+        return groupedComments
+      } catch (error) {
+        console.error('Error fetching comments:', error)
+        return {}
+      }
     },
     enabled: posts.length > 0
   })
@@ -254,7 +326,6 @@ export default function HomePage() {
               )}
               <PostCard
                 post={post}
-                reactions={allReactions[post.id] || []}
                 comments={commentsData[post.id] || []}
               />
             </div>

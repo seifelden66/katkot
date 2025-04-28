@@ -2,98 +2,162 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl';
-import { useApi } from '@/hooks/useApi'
+import { useLocale } from 'next-intl'
+// import { useApi } from '@/hooks/useApi'
 import RichTextEditor from './RichTextEditor'
+import { toast } from 'react-toastify'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+interface Category {
+  id: number
+  name: string
+}
+
+interface Store {
+  id: number
+  name: string
+}
+
+interface Region {
+  id: number
+  name: string
+}
+
+// interface ApiResponse<T> {
+//   data?: T
+//   error?: {
+//     message: string
+//   }
+// }
 
 export default function CreatePost() {
   const locale = useLocale()
   const router = useRouter()
-  const { request } = useApi()
+  const queryClient = useQueryClient()
+  // const { request } = useApi()
   const [content, setContent] = useState('')
   const [media_url, setMedia] = useState('')
   const [affiliateLink, setAffiliateLink] = useState('')
   const [description, setDescription] = useState('')
   const [error, setError] = useState('')
-
-  // Add category and store states
-  const [categories, setCategories] = useState<Array<{ id: number; name: string }>>([])
-  const [stores, setStores] = useState<Array<{ id: number; name: string }>>([])
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null)
-  const [regions, setRegions] = useState<Array<{ id: number; name: string }>>([])
-  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) // Default to Global
+  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // Fetch categories
-      const { data: categoriesData, error: categoriesError } = await supabase
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('categories')
         .select('id, name')
+      
+      if (error) throw error
+      return data || []
+    }
+  })
 
-      if (categoriesError) {
-        console.error('Error fetching categories:', categoriesError)
-      }
-
-      if (categoriesData) {
-        setCategories(categoriesData)
-        // Set default category if exists (e.g., "uncategorized")
-        const defaultCat = categoriesData.find(c => c.name.toLowerCase() === 'uncategorized')
-        if (defaultCat) setSelectedCategoryId(defaultCat.id)
-      }
-
-      // Fetch stores
-      const { data: storesData, error: storesError } = await supabase
+  // Fetch stores using React Query
+  const { data: stores = [] } = useQuery<Store[]>({
+    queryKey: ['stores'],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('stores')
         .select('id, name')
+      
+      if (error) throw error
+      return data || []
+    }
+  })
 
-      if (storesError) {
-        console.error('Error fetching stores:', storesError)
-      }
-
-      if (storesData) {
-        setStores(storesData)
-      }
-
-      // Fetch regions
-      const { data: regionsData, error: regionsError } = await supabase
+  // Fetch regions using React Query
+  const { data: regions = [] } = useQuery<Region[]>({
+    queryKey: ['regions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('regions')
         .select('id, name')
         .order('name', { ascending: true })
-
-      if (regionsError) {
-        console.error('Error fetching regions:', regionsError)
-      }
-
-      if (regionsData) {
-        setRegions(regionsData)
-      }
+      
+      if (error) throw error
+      return data || []
     }
-    fetchData()
-  }, [])
+  })
+
+  useEffect(() => {
+    if (categories.length > 0 && selectedCategoryId === null) {
+      const defaultCat = categories.find(c => c.name.toLowerCase() === 'uncategorized')
+      if (defaultCat) setSelectedCategoryId(defaultCat.id)
+    }
+  }, [categories, selectedCategoryId])
+
+  const createPostMutation = useMutation({
+    mutationFn: async (payload: {
+      content: string;
+      media_url: string;
+      affiliate_link: string;
+      category_id: number | null;
+      store_id: number | null;
+      region_id: number | null;
+      description: string;
+      user_id: string;
+    }) => {
+      try {
+        // const apiResponse = await request('posts', 'POST', payload) as unknown as ApiResponse<any>
+        
+        // if (apiResponse?.error) {
+        //   throw new Error(apiResponse.error.message || 'Error creating post')
+        // }
+        
+        // if (apiResponse?.data) {
+        //   return apiResponse.data
+        // }
+        
+        console.log('Falling back to direct Supabase insertion')
+        const { data, error: insertError } = await supabase
+          .from('posts')
+          .insert(payload)
+          .select()
+        
+        if (insertError) throw new Error(insertError.message)
+        return data
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error
+        }
+        throw new Error('An unexpected error occurred')
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      toast.success('Post created successfully!')
+      router.push('/' + locale + '/')
+    },
+    onError: (error: Error) => {
+      console.error('Submission error:', error)
+      setError(error.message || 'An unexpected error occurred')
+    }
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError('')
 
-    // Basic validation
     if (!content.trim()) {
-      setError('Please enter some content for your post');
-      return;
+      setError('Please enter some content for your post')
+      return
     }
 
-    // Validate store_id
     if (!selectedStoreId) {
-      setError('Please select a store');
-      return;
+      setError('Please select a store')
+      return
     }
 
     try {
-      const userResult = await supabase.auth.getUser();
+      const userResult = await supabase.auth.getUser()
       if (!userResult || !userResult.data || !userResult.data.user) {
-        throw new Error('Not authenticated');
+        throw new Error('Not authenticated')
       }
-      const user = userResult.data.user;
+      const user = userResult.data.user
 
       const payload = {
         content,
@@ -104,43 +168,21 @@ export default function CreatePost() {
         region_id: selectedRegionId,
         description,
         user_id: user.id,
-      };
+      }
 
-      console.log('Submitting post with payload:', payload);
-
-      // First approach: Using your custom API hook
-      const response = request('posts', 'POST', payload);
+      console.log('Submitting post with payload:', payload)
       
-      if (response?.error) {
-        console.error('Error creating post:', response.error);
-        setError(response.error.message || 'Error creating post');
-        return;
+      createPostMutation.mutate(payload)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Submission error:', error)
+        setError(error.message || 'An unexpected error occurred')
+      } else {
+        console.error('Unexpected error:', error)
+        setError('An unexpected error occurred')
       }
-
-      // If the custom API hook fails, try direct Supabase insertion as fallback
-      if (!response || !response.data) {
-        console.log('Falling back to direct Supabase insertion');
-        const { data, error: insertError } = await supabase
-          .from('posts')
-          .insert(payload)
-          .select();
-
-        if (insertError) {
-          console.error('Error inserting post directly:', insertError);
-          setError(insertError.message || 'Error creating post');
-          return;
-        }
-      }
-
-      // Success - redirect to home page
-      toast.success('Post created successfully!');
-      router.push('/' + locale + '/');
-    } catch (err: any) {
-      console.error('Submission error:', err);
-      setError(err.message || 'An unexpected error occurred');
     }
-  };
-
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -250,8 +292,9 @@ export default function CreatePost() {
         <button
           type="submit"
           className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md"
+          disabled={createPostMutation.isPending}
         >
-          Create Post
+          {createPostMutation.isPending ? 'Creating...' : 'Create Post'}
         </button>
       </div>
       </div>

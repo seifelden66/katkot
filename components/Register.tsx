@@ -4,6 +4,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query'
+// import { useEffect } from 'react'
+
+interface Region {
+  id: number;
+  name: string;
+}
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -16,11 +23,12 @@ export default function Register() {
   const locale = useLocale()
   const t = useTranslations('auth');
   const isRTL = locale === 'ar';
-  const [regions, setRegions] = useState<Array<{ id: number; name: string }>>([])
-  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) // Default to Global
+  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) 
   
-  useEffect(() => {
-    const fetchRegions = async () => {
+  // Fetch regions using React Query
+  const { data: regions = [] } = useQuery<Region[]>({
+    queryKey: ['regions'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('regions')
         .select('id, name')
@@ -28,13 +36,11 @@ export default function Register() {
       
       if (error) {
         console.error('Error fetching regions:', error)
-      } else if (data) {
-        setRegions(data)
+        throw error
       }
+      return data || []
     }
-    
-    fetchRegions()
-  }, [])
+  })
   
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()

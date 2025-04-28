@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Image from 'next/image'
@@ -44,7 +44,6 @@ export default function UserProfilePage() {
   const currentUserId = session?.user?.id
   const locale = useLocale()
 
-  // Use React Query hooks
   const {
     data: profile,
     isLoading: isProfileLoading,
@@ -65,7 +64,6 @@ export default function UserProfilePage() {
     enabled: !!userId
   })
 
-  // Handle errors
   useEffect(() => {
     if (profileError) {
       toast.error('Failed to load user profile')
@@ -91,7 +89,6 @@ export default function UserProfilePage() {
     enabled: !!userId
   })
 
-  // Following Count Query
   const { data: followingCount = 0 } = useQuery({
     queryKey: ['following-count', userId],
     queryFn: async () => {
@@ -121,7 +118,7 @@ export default function UserProfilePage() {
 
       if (error) {
         if (error.code === 'PGRST116') {
-          return false // No record found
+          return false 
         }
         throw error
       }
@@ -142,7 +139,6 @@ export default function UserProfilePage() {
 
     try {
       if (isFollowing) {
-        // Unfollow
         const { error } = await supabase
           .from('follows')
           .delete()
@@ -151,7 +147,6 @@ export default function UserProfilePage() {
 
         if (error) throw error
 
-        // Batch invalidate queries
         await queryClient.invalidateQueries({
           predicate: (query) => 
             query.queryKey[0] === 'follower-count' ||
@@ -160,7 +155,6 @@ export default function UserProfilePage() {
         
         toast.success('Unfollowed successfully')
       } else {
-        // Check if the relationship already exists
         const { data: existingFollow } = await supabase
           .from('follows')
           .select('*')
@@ -179,7 +173,6 @@ export default function UserProfilePage() {
 
           if (error) throw error
 
-          // Batch invalidate queries
           await queryClient.invalidateQueries({
             predicate: (query) => 
               query.queryKey[0] === 'follower-count' ||
@@ -330,7 +323,7 @@ export default function UserProfilePage() {
                         height={600}
                         alt="Post media content"
                         className="w-full h-auto object-cover max-h-[500px]"
-                        unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:') ? 'true' : undefined}
+                        unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:') ? true : undefined}
                       />
                     )}
                   </div>
@@ -361,4 +354,6 @@ export default function UserProfilePage() {
       )}
     </div>
   )
+
+ 
 }

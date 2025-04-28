@@ -9,7 +9,58 @@ import { formatDistanceToNow } from 'date-fns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabaseClient'
 
-// Shimmer effect component for loading state
+interface Profile {
+  avatar_url?: string;
+  full_name?: string;
+}
+
+interface Comment {
+  id: number; 
+  post_id?: number;
+  user_id?: string;
+  content: string;
+  created_at: string;
+  author?: {
+    full_name: string;
+    avatar_url: string | null;
+  };
+  profiles?: {
+    avatar_url?: string;
+    full_name?: string;
+  };
+}
+
+interface Category {
+  name: string;
+}
+
+interface Post {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  category_id?: string;
+  store_name?: string;
+  media_url?: string;
+  author?: Profile;
+  category?: Category;
+}
+
+interface PostCardProps {
+  post: Post;
+  comments?: Comment[];
+}
+
+interface CommentItemProps {
+  comment: Comment;
+}
+
+interface AddCommentParams {
+  postId: string;
+  userId: string;
+  content: string;
+}
+
 export const ShimmerEffect = () => (
   <div className="animate-pulse rounded-xl shadow-sm border border-gray-200  overflow-hidden p-4 mb-4">
     <div className="flex items-center gap-3 mb-4">
@@ -43,7 +94,7 @@ export const ShimmerEffect = () => (
   </div>
 );
 
-const CommentItem = ({ comment }: { comment: any }) => (
+const CommentItem = ({ comment }: CommentItemProps) => (
   console.log(comment),
   
   <div className="flex items-start gap-3 p-3 border-b border-gray-100  hover:bg-gray-50 transition-colors">
@@ -72,14 +123,14 @@ const CommentItem = ({ comment }: { comment: any }) => (
   </div>
 );
 
-export default function PostCard({ post, comments = [] }: { post: any, comments?: any[] }) {
+export default function PostCard({ post, comments = [] }: PostCardProps) {
   const { session } = useSession()  
   const locale = useLocale();
   const userId = session?.user?.id
   const queryClient = useQueryClient()
   
   const { mutate: addComment, isPending: isCommenting } = useMutation({
-    mutationFn: async ({ postId, userId, content }: { postId: string, userId: string, content: string }) => {
+    mutationFn: async ({ postId, userId, content }: AddCommentParams) => {
       const { data, error } = await supabase
         .from('comments')
         .insert({
@@ -92,11 +143,11 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
       return data[0]  
      },
     onSuccess: (newComment, variables) => {
-      queryClient.setQueryData(['comments', variables.postId], (oldComments: any[] = []) => {
+      queryClient.setQueryData(['comments', variables.postId], (oldComments: Comment[] = []) => {
         return [...oldComments, newComment]
       })
 
-      queryClient.setQueryData(['comments'], (oldData: Record<string, any[]> = {}) => {
+      queryClient.setQueryData(['comments'], (oldData: Record<string, Comment[]> = {}) => {
         const updatedComments = { ...oldData }
         if (!updatedComments[variables.postId]) {
           updatedComments[variables.postId] = []
@@ -125,7 +176,6 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
   return (
     <div className="rounded-xl shadow-sm overflow-hidden mb-4">
       <div className="p-4">
-        {/* Post Header */}
         <div className="flex items-center gap-3 mb-3">
           <Link href={`/${locale}/profile/${post.user_id}`}>
             {post.author?.avatar_url ? (
@@ -203,14 +253,12 @@ export default function PostCard({ post, comments = [] }: { post: any, comments?
             Comments ({comments.length})
           </h4>
           
-          {/* Comments List */}
           <div className="space-y-1">
             {comments.map(comment => (
               <CommentItem key={comment.id} comment={comment} />
             ))}
           </div>
           
-          {/* Comment Form */}
           {session ? (
             <form 
               onSubmit={(e) => {

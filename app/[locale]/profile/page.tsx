@@ -1,7 +1,7 @@
 'use client'
 import { useSession } from '@/contexts/SessionContext'
 import { supabase } from '@/lib/supabaseClient'
-import Image from 'next/image'
+// import Image from 'next/image'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
 import { toast } from 'react-toastify'
@@ -181,7 +181,7 @@ export default function ProfilePage() {
                       height={600}
                       alt="Post media"
                       className="w-full h-auto object-cover max-h-[500px]"
-                      unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
+                      // unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
                     />
                   </div>
                 )}
@@ -221,7 +221,7 @@ export default function ProfilePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
           </svg>
           <h3 className="text-lg font-medium mb-2">No posts yet</h3>
-          <p className="text-gray-500 ">This user hasn't created any posts yet.</p>
+          <p className="text-gray-500 ">This user hasn&apos;t created any posts yet.</p>
         </div>
       )}
     </div>

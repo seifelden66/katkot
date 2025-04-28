@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useSession } from '@/contexts/SessionContext'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+// import Image from 'next/image'
 import { toast } from 'react-toastify'
 import { useLocale } from 'next-intl';
 
@@ -13,7 +13,7 @@ export default function EditProfilePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [profile, setProfile] = useState<any>(null)
+  // const [profile, setProfile] = useState<any>(null)
   const [fullName, setFullName] = useState('')
   const [bio, setBio] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
@@ -24,7 +24,6 @@ export default function EditProfilePage() {
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null)
   
   useEffect(() => {
-    // Redirect if not logged in
     if (session === null) {
       router.push(locale+'/auth/login')
       return
@@ -45,7 +44,7 @@ export default function EditProfilePage() {
         console.error('Error fetching profile:', error)
         toast.error('Failed to load profile')
       } else if (data) {
-        setProfile(data)
+        // setProfile(data)
         setFullName(data.full_name || '')
         setBio(data.bio || '')
         setAvatarUrl(data.avatar_url || '')
@@ -66,7 +65,6 @@ export default function EditProfilePage() {
     const file = e.target.files[0]
     setAvatarFile(file)
     
-    // Create preview
     const reader = new FileReader()
     reader.onloadend = () => {
       setAvatarPreview(reader.result as string)
