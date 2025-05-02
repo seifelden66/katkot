@@ -8,10 +8,10 @@ export default function QueryProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        staleTime: 5 * 60 * 1000, 
+        gcTime: 10 * 60 * 1000,
         refetchOnWindowFocus: true,
         retry: 1,
-        // Disable queries during SSR to prevent hydration issues
         enabled: typeof window !== 'undefined',
       },
     },

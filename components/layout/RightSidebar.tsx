@@ -1,15 +1,15 @@
 'use client'
-import { SearchIcon } from '@/components/icons/Icons'
-import CategoryFilter from '../CategoryFilter'
-import StoreFilter from '../StoreFilter'
 import { useSession } from '@/contexts/SessionContext'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabaseClient'
-import Image from 'next/image'
 import { useLocale } from 'next-intl'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabaseClient'
 import { toast } from 'react-toastify'
+import Image from 'next/image'
 import Link from 'next/link'
-// import { toast } from 'react-hot-toast'
+import CategoryFilter from '@/components/CategoryFilter'
+import StoreFilter from '@/components/StoreFilter'
+import { SearchIcon } from '@/components/icons/Icons'
+import { useUsersToFollow } from '@/app/hooks/queries/usePostQueries'
 
 export default function RightSidebar() {
   const { session } = useSession()
@@ -17,28 +17,7 @@ export default function RightSidebar() {
   const queryClient = useQueryClient()
   const currentUserId = session?.user?.id
 
-  const { data: usersToFollow = [] } = useQuery({
-    queryKey: ['users-to-follow'],
-    queryFn: async () => {
-      if (!currentUserId) return []
-
-      const { data: followingData } = await supabase
-        .from('follows')
-        .select('following_id')
-        .eq('follower_id', currentUserId)
-
-      const followingIds = followingData?.map(f => f.following_id) || []
-
-      const { data: users } = await supabase
-        .from('profiles')
-        .select('*')
-        .not('id', 'in', `(${[currentUserId, ...followingIds].join(',')})`)
-        .limit(3)
-
-      return users || []
-    },
-    enabled: !!currentUserId
-  })
+  const { data: usersToFollow = [] } = useUsersToFollow(currentUserId)
 
   const { mutate: followUser } = useMutation({
     mutationFn: async (userId: string) => {

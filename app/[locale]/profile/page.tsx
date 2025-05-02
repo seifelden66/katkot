@@ -1,87 +1,26 @@
 'use client'
 import { useSession } from '@/contexts/SessionContext'
-import { supabase } from '@/lib/supabaseClient'
-// import Image from 'next/image'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
-import { toast } from 'react-toastify'
-import { useQuery } from '@tanstack/react-query'
+// import { toast } from 'react-toastify'
+import {
+  useUserProfile,
+  useUserPosts,
+  useFollowerCount,
+  useFollowingCount
+} from '@/app/hooks/queries/usePostQueries'
 
 export default function ProfilePage() {
   const { session } = useSession()
-  const locale    = useLocale()
-  const userId    = session?.user?.id
+  const locale = useLocale()
+  const userId = session?.user?.id
 
-  const { data: profile, isLoading: isProfileLoading } = useQuery({
-    queryKey: ['profile', userId],
-    queryFn: async () => {
-      if (!userId) return null
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*, regions(*)')
-        .eq('id', userId)
-        .single()
-      if (error) {
-        toast.error('Failed to load profile')
-        throw error
-      }
-      return data
-    },
-    enabled: !!userId,
-    refetchOnMount: 'always'
-  })
-
-  const { data: userPosts = [], isLoading: isPostsLoading } = useQuery({
-    queryKey: ['user-posts', userId],
-    queryFn: async () => {
-      if (!userId) return []
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          author:profiles!user_id (full_name, avatar_url),
-          category:categories!posts_category_id_fkey (name),
-          store_name,
-          description
-        `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-      if (error) {
-        toast.error('Failed to load posts')
-        throw error
-      }
-      return data || []
-    },
-    enabled: !!userId
-  })
-
-  const { data: followerCount = 0 } = useQuery({
-    queryKey: ['follower-count', userId],
-    queryFn: async () => {
-      if (!userId) return 0
-      const { count, error } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact', head: true })
-        .eq('following_id', userId)
-      if (error) throw error
-      return count || 0
-    },
-    enabled: !!userId
-  })
-
-  const { data: followingCount = 0 } = useQuery({
-    queryKey: ['following-count', userId],
-    queryFn: async () => {
-      if (!userId) return 0
-      const { count, error } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact', head: true })
-        .eq('follower_id', userId)
-      if (error) throw error
-      return count || 0
-    },
-    enabled: !!userId
-  })
+  const { data: profile, isLoading: isProfileLoading } = useUserProfile(userId)
+  console.log(profile, userId);
+  
+  const { data: userPosts = [], isLoading: isPostsLoading } = useUserPosts(userId)
+  const { data: followerCount = 0 } = useFollowerCount(userId)
+  const { data: followingCount = 0 } = useFollowingCount(userId)
 
   if (isProfileLoading || isPostsLoading) {
     return (
@@ -107,10 +46,12 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
+    
       <div className="rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200  overflow-hidden flex-shrink-0">
+              
               {profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -131,7 +72,7 @@ export default function ProfilePage() {
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 {profile?.full_name || 'User'}
               </h1>
-              
+
               {profile?.regions && (
                 <div className="mb-3">
                   <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">
@@ -139,7 +80,7 @@ export default function ProfilePage() {
                   </span>
                 </div>
               )}
-              
+
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mb-4">
                 <div className="text-center">
                   <span className="block text-xl font-bold text-gray-900 ">{userPosts.length}</span>
@@ -155,7 +96,7 @@ export default function ProfilePage() {
                 </div>
               </div>
               {profile?.bio && (
-                <p className="text-gray-700  mb-4 max-w-lg">{profile.bio}</p>
+                <p className="text-gray-700  mb-4 max-w-lg">{profile?.bio}</p>
               )}
               <Link
                 href={`/${locale}/profile/edit`}
@@ -181,7 +122,7 @@ export default function ProfilePage() {
                       height={600}
                       alt="Post media"
                       className="w-full h-auto object-cover max-h-[500px]"
-                      // unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
+                    // unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
                     />
                   </div>
                 )}

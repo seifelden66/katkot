@@ -1,40 +1,21 @@
 'use client'
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
 import { useSession } from '@/contexts/SessionContext'
 import { useLocale } from 'next-intl'
-import { useQuery } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
-
-const fetchUserProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*, regions(*)')
-    .eq('id', userId)
-    .single()
-
-  if (error) throw error
-  return data
-}
-
-const fetchUserPosts = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('posts')
-    .select(`
-      *,
-      author:profiles!user_id (full_name, avatar_url),
-      category:categories!posts_category_id_fkey (name)
-    `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-
-  if (error) throw error
-  return data || []
-}
+import { 
+  useUserProfile, 
+  useUserPosts, 
+  useFollowerCount, 
+  useFollowingCount, 
+  useIsFollowing,
+  useExistingFollow
+} from '@/app/hooks/queries/usePostQueries'
+import { supabase } from '@/lib/supabaseClient'
 
 export default function UserProfilePage() {
   const queryClient = useQueryClient()
@@ -48,21 +29,13 @@ export default function UserProfilePage() {
     data: profile,
     isLoading: isProfileLoading,
     error: profileError
-  } = useQuery({
-    queryKey: ['profile', userId],
-    queryFn: () => fetchUserProfile(userId),
-    enabled: !!userId
-  })
+  } = useUserProfile(userId)
 
   const {
     data: userPosts = [],
     isLoading: isPostsLoading,
     error: postsError
-  } = useQuery({
-    queryKey: ['userPosts', userId],
-    queryFn: () => fetchUserPosts(userId),
-    enabled: !!userId
-  })
+  } = useUserPosts(userId)
 
   useEffect(() => {
     if (profileError) {
@@ -73,59 +46,10 @@ export default function UserProfilePage() {
     }
   }, [profileError, postsError])
 
-  const { data: followerCount = 0 } = useQuery({
-    queryKey: ['follower-count', userId],
-    queryFn: async () => {
-      if (!userId) return 0
-
-      const { count, error } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact', head: true })
-        .eq('following_id', userId)
-
-      if (error) throw error
-      return count || 0
-    },
-    enabled: !!userId
-  })
-
-  const { data: followingCount = 0 } = useQuery({
-    queryKey: ['following-count', userId],
-    queryFn: async () => {
-      if (!userId) return 0
-
-      const { count, error } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact', head: true })
-        .eq('follower_id', userId)
-
-      if (error) throw error
-      return count || 0
-    },
-    enabled: !!userId
-  })
-  const { data: isFollowing = false } = useQuery({
-    queryKey: ['isFollowing', userId, currentUserId],
-    queryFn: async () => {
-      if (!currentUserId || !userId) return false
-
-      const { data, error } = await supabase
-        .from('follows')
-        .select('*')
-        .eq('follower_id', currentUserId)
-        .eq('following_id', userId)
-        .single()
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          return false 
-        }
-        throw error
-      }
-      return !!data
-    },
-    enabled: !!currentUserId && !!userId && currentUserId !== userId
-  })
+  const { data: followerCount = 0 } = useFollowerCount(userId)
+  const { data: followingCount = 0 } = useFollowingCount(userId)
+  const { data: isFollowing = false } = useIsFollowing(userId, currentUserId)
+  const { data: existingFollow } = useExistingFollow(currentUserId, userId)
 
   const handleFollow = async () => {
     if (!currentUserId) {
@@ -150,18 +74,12 @@ export default function UserProfilePage() {
         await queryClient.invalidateQueries({
           predicate: (query) => 
             query.queryKey[0] === 'follower-count' ||
-            query.queryKey[0] === 'isFollowing'
+            query.queryKey[0] === 'isFollowing' ||
+            query.queryKey[0] === 'existingFollow'
         })
         
         toast.success('Unfollowed successfully')
       } else {
-        const { data: existingFollow } = await supabase
-          .from('follows')
-          .select('*')
-          .eq('follower_id', currentUserId)
-          .eq('following_id', userId)
-          .single()
-
         if (!existingFollow) {
           const { error } = await supabase
             .from('follows')
@@ -176,7 +94,8 @@ export default function UserProfilePage() {
           await queryClient.invalidateQueries({
             predicate: (query) => 
               query.queryKey[0] === 'follower-count' ||
-              query.queryKey[0] === 'isFollowing'
+              query.queryKey[0] === 'isFollowing' ||
+              query.queryKey[0] === 'existingFollow'
           })
           
           toast.success('Followed successfully')
@@ -221,7 +140,7 @@ export default function UserProfilePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
           <h2 className="text-xl font-bold  mb-2">User not found</h2>
-          <p className="text-gray-500  mb-4">The user you're looking for doesn't exist or has been removed.</p>
+          <p className="text-gray-500  mb-4">The user you are looking for does not exist or has been removed.</p>
           <Link
             href={`/${locale}/`}
             className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md inline-flex items-center"
@@ -349,7 +268,7 @@ export default function UserProfilePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
           </svg>
           <h3 className="text-lg font-medium  mb-2">No posts yet</h3>
-          <p className="text-gray-500 ">This user hasn't created any posts yet.</p>
+          <p className="text-gray-500 ">This user has not created any posts yet.</p>
         </div>
       )}
     </div>

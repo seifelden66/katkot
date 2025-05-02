@@ -6,8 +6,9 @@ import Image from 'next/image'
 import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabaseClient'
+// import { useMutation, useQueryClient } from '@tanstack/react-query'
+// import { supabase } from '@/lib/supabaseClient'
+import { useAddComment } from '@/app/hooks/queries/usePostQueries';
 
 interface Profile {
   avatar_url?: string;
@@ -55,11 +56,11 @@ interface CommentItemProps {
   comment: Comment;
 }
 
-interface AddCommentParams {
-  postId: string;
-  userId: string;
-  content: string;
-}
+// interface AddCommentParams {
+//   postId: string;
+//   userId: string;
+//   content: string;
+// }
 
 export const ShimmerEffect = () => (
   <div className="animate-pulse rounded-xl shadow-sm border border-gray-200  overflow-hidden p-4 mb-4">
@@ -127,36 +128,8 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
   const { session } = useSession()  
   const locale = useLocale();
   const userId = session?.user?.id
-  const queryClient = useQueryClient()
   
-  const { mutate: addComment, isPending: isCommenting } = useMutation({
-    mutationFn: async ({ postId, userId, content }: AddCommentParams) => {
-      const { data, error } = await supabase
-        .from('comments')
-        .insert({
-          post_id: postId,
-          user_id: userId,
-          content
-        })
-        .select('*, profiles(*)')        
-      if (error) throw error
-      return data[0]  
-     },
-    onSuccess: (newComment, variables) => {
-      queryClient.setQueryData(['comments', variables.postId], (oldComments: Comment[] = []) => {
-        return [...oldComments, newComment]
-      })
-
-      queryClient.setQueryData(['comments'], (oldData: Record<string, Comment[]> = {}) => {
-        const updatedComments = { ...oldData }
-        if (!updatedComments[variables.postId]) {
-          updatedComments[variables.postId] = []
-        }
-        updatedComments[variables.postId] = [...updatedComments[variables.postId], newComment]
-        return updatedComments
-      })
-    }
-  })
+  const { mutate: addComment, isPending: isCommenting } = useAddComment();
   
   const handleComment = useCallback((e: React.FormEvent, content: string) => {
     e.preventDefault()

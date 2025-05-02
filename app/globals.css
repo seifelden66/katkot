@@ -28,16 +28,13 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
-/* Example in your global CSS (e.g., styles/globals.css) */
 .ProseMirror {
-  min-height: 150px; /* Or your desired minimum height */
-  outline: none; /* Remove default focus outline if desired */
-  /* These are crucial for multi-line editing */
+  min-height: 150px;
+  outline: none; 
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-/* Ensure paragraphs and other block elements have margins */
 .ProseMirror p {
   margin-bottom: 1em;
 }
@@ -45,4 +42,3 @@ body {
   margin-top: 1.25em;
   margin-bottom: 0.75em;
 }
-/* Add styles for lists, blockquotes etc. as needed if prose isn't working */

@@ -6,22 +6,23 @@ import { useLocale } from 'next-intl'
 // import { useApi } from '@/hooks/useApi'
 import RichTextEditor from './RichTextEditor'
 import { toast } from 'react-toastify'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useCategories, useRegions, useStores } from '@/app/hooks/queries/usePostQueries'
 
-interface Category {
-  id: number
-  name: string
-}
+// interface Category {
+//   id: number
+//   name: string
+// }
 
-interface Store {
-  id: number
-  name: string
-}
+// interface Store {
+//   id: number
+//   name: string
+// }
 
-interface Region {
-  id: number
-  name: string
-}
+// interface Region {
+//   id: number
+//   name: string
+// }
 
 // interface ApiResponse<T> {
 //   data?: T
@@ -44,44 +45,23 @@ export default function CreatePost() {
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null)
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) 
 
-  const { data: categories = [] } = useQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('id, name')
-      
-      if (error) throw error
-      return data || []
-    }
-  })
-
-  // Fetch stores using React Query
-  const { data: stores = [] } = useQuery<Store[]>({
-    queryKey: ['stores'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('stores')
-        .select('id, name')
-      
-      if (error) throw error
-      return data || []
-    }
-  })
-
+  // Use the hooks from usePostQueries instead of direct fetching
+  const { data: categories = [] } = useCategories()
+  const { data: stores = [] } = useStores()
+  const {data:regions = []} = useRegions()
   // Fetch regions using React Query
-  const { data: regions = [] } = useQuery<Region[]>({
-    queryKey: ['regions'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('regions')
-        .select('id, name')
-        .order('name', { ascending: true })
+  // const { data: regions = [] } = useQuery<Region[]>({
+  //   queryKey: ['regions'],
+  //   queryFn: async () => {
+  //     const { data, error } = await supabase
+  //       .from('regions')
+  //       .select('id, name')
+  //       .order('name', { ascending: true })
       
-      if (error) throw error
-      return data || []
-    }
-  })
+  //     if (error) throw error
+  //     return data || []
+  //   }
+  // })
 
   useEffect(() => {
     if (categories.length > 0 && selectedCategoryId === null) {
@@ -102,16 +82,7 @@ export default function CreatePost() {
       user_id: string;
     }) => {
       try {
-        // const apiResponse = await request('posts', 'POST', payload) as unknown as ApiResponse<any>
-        
-        // if (apiResponse?.error) {
-        //   throw new Error(apiResponse.error.message || 'Error creating post')
-        // }
-        
-        // if (apiResponse?.data) {
-        //   return apiResponse.data
-        // }
-        
+     
         console.log('Falling back to direct Supabase insertion')
         const { data, error: insertError } = await supabase
           .from('posts')

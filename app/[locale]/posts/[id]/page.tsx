@@ -2,19 +2,16 @@
 import { useParams, useRouter } from 'next/navigation'
 import PostCard from '@/components/PostCard'
 import { useCallback, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabaseClient'
-import { Post, Profile } from '@/types/post'
 import { useLocale } from 'next-intl'
 
-interface Store {
-  id: string;
-  name: string;
-  description?: string;
-  website?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+// interface Store {
+//   id: string;
+//   name: string;
+//   description?: string;
+//   website?: string;
+//   created_at?: string;
+//   updated_at?: string;
+// }
 
 const PostSkeleton = () => (
   <div className="max-w-3xl mx-auto py-8 px-4 animate-pulse">
@@ -26,18 +23,42 @@ const PostSkeleton = () => (
   </div>
 )
 
-interface PostWithAuthor extends Post {
-  profiles: Profile;
-  store_id?: string | number;
-  description?: string;
-}
+
+
+import { usePost,  useStore, useNextPostId, usePrevPostId } from '@/app/hooks/queries/usePostQueries';
 
 export default function PostPage() {
   const params = useParams()
   const router = useRouter()
   const postId = params?.id as string
   const locale = useLocale()
-  // const [ setReactions] = useState([])
+
+  const {
+    data: post,
+    isLoading: isPostLoading,
+    error: postError
+  } = usePost(postId);
+
+  const {
+    data: store,
+    error: storeError
+  } = useStore(post?.store_id);
+
+  // const {
+  //   data: comments = [],
+  //   error: commentsError
+  // } = useComments(postId);
+
+  const {
+    data: nextPostId,
+    error: nextPostError
+  } = useNextPostId(postId);
+
+  const {
+    data: prevPostId,
+    error: prevPostError
+  } = usePrevPostId(postId);
+
 
   useEffect(() => {
     if (!postId) {
@@ -45,136 +66,17 @@ export default function PostPage() {
     }
   }, [postId])
 
-  const {
-    data: post,
-    isLoading: isPostLoading,
-    error: postError
-  } = useQuery({
-    queryKey: ['post', postId],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('*, profiles(*)')
-          .eq('id', postId)
-          .single()
-
-        if (error) throw error
-        return data as PostWithAuthor
-      } catch (error) {
-        console.error('Error fetching post:', error)
-        throw error
-      }
-    },
-    enabled: !!postId
-  })
-
-  const {
-    data: store,
-    error: storeError
-  } = useQuery({
-    queryKey: ['store', post?.store_id],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('stores')
-          .select('*')
-          .eq('id', post?.store_id)
-          .single()
-
-        if (error) throw error
-        return data as Store
-      } catch (error) {
-        console.error('Error fetching store:', error)
-        throw error
-      }
-    },
-    enabled: !!post?.store_id
-  })
-
-  const {
-    data: comments = [],
-    error: commentsError
-  } = useQuery({
-    queryKey: ['comments', postId],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('comments')
-          .select('*, profiles(*)')
-          .eq('post_id', postId)
-          .order('created_at', { ascending: true })
-
-        if (error) throw error
-        return data || []
-      } catch (error) {
-        console.error('Error fetching comments:', error)
-        return []
-      }
-    },
-    enabled: !!postId
-  })
-
-   const {
-    data: nextPostId,
-    error: nextPostError
-  } = useQuery({
-    queryKey: ['nextPost', postId],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('id')
-          .gt('id', postId)
-          .order('id', { ascending: true })
-          .limit(1)
-
-        if (error) throw error
-        return data && data.length > 0 ? data[0].id : null
-      } catch (error) {
-        console.error('Error fetching next post:', error)
-        return null
-      }
-    },
-    enabled: !!postId
-  })
-
-  const {
-    data: prevPostId,
-    error: prevPostError
-  } = useQuery({
-    queryKey: ['prevPost', postId],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('id')
-          .lt('id', postId)
-          .order('id', { ascending: false })
-          .limit(1)
-
-        if (error) throw error
-        return data && data.length > 0 ? data[0].id : null
-      } catch (error) {
-        console.error('Error fetching previous post:', error)
-        return null
-      }
-    },
-    enabled: !!postId
-  })
-
   useEffect(() => {
     if (storeError) console.error('Store error:', storeError)
-    if (commentsError) console.error('Comments error:', commentsError)
     if (nextPostError) console.error('Next post error:', nextPostError)
     if (prevPostError) console.error('Previous post error:', prevPostError)
-  }, [storeError, commentsError, nextPostError, prevPostError])
+  }, [storeError, nextPostError, prevPostError])
 
   const navigateToPost = useCallback((postId: string | null) => {
     if (postId && !isPostLoading) {
       router.push(`/${locale}/posts/${postId}`)
     }
-  }, [isPostLoading, router, locale])
+  }, [router, locale, isPostLoading])
 
   if (isPostLoading) return <PostSkeleton />
 
@@ -232,7 +134,7 @@ export default function PostPage() {
         </button>
       </div>
 
-      <PostCard post={{...post, category_id: post.category_id?.toString()}} comments={comments} />
+      <PostCard post={{...post, category_id: post.category_id?.toString()}}  />
 
       {store && (
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">

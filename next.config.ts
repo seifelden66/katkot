@@ -15,7 +15,6 @@ const baseConfig: NextConfig = {
       },
     ]
   },
-  // Remove the i18n config here - it's not compatible with the app router
   // i18n: {
   //   locales: ['en', 'ar'],
   //   defaultLocale: 'en',

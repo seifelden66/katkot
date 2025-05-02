@@ -43,15 +43,10 @@ export default async function LocaleLayout({
   params: { locale: string };
 }) {
   const messages = await getMessages({ locale });
-  const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir}>
-      <body suppressHydrationWarning>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ClientLayout>{children}</ClientLayout>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <ClientLayout>{children}</ClientLayout>
+    </NextIntlClientProvider>
   );
 }

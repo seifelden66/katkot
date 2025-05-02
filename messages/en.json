@@ -1,5 +1,10 @@
 {
     "hello": "Hello",
+    "NotFound":{
+        "title": "Page Not Found",
+        "description": "The page you are looking for does not exist.",
+        "goHome": "Go Home"
+    },
     "sidebar": {
         "nav": {
             "home": "Home",
