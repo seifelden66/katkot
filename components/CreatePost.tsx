@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl'
 // import { useApi } from '@/hooks/useApi'
 import RichTextEditor from './RichTextEditor'
 import { toast } from 'react-toastify'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useCategories, useRegions, useStores } from '@/app/hooks/queries/usePostQueries'
 
 // interface Category {
@@ -45,7 +45,6 @@ export default function CreatePost() {
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null)
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) 
 
-  // Use the hooks from usePostQueries instead of direct fetching
   const { data: categories = [] } = useCategories()
   const { data: stores = [] } = useStores()
   const {data:regions = []} = useRegions()

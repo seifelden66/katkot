@@ -1,12 +1,12 @@
 'use client'
 import { useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import {  useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Cookies from 'js-cookie'
 
 export default function AuthCallback() {
   const router = useRouter()
-  const params = useSearchParams()
+  // const params = useSearchParams()
 
   useEffect(() => {
     const handleOAuthCallback = async () => {

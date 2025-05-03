@@ -1,13 +1,13 @@
 'use client'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedCategory, clearFilters } from '@/lib/store'
-import { useEffect, useState } from 'react'
+// import { useEffect } from 'react'
 import type { RootState } from '@/lib/store'
-import { supabase } from '@/lib/supabaseClient'
+import { useCategories } from '@/app/hooks/queries/usePostQueries'
 
 export default function CategoryFilter() {
   const dispatch = useDispatch()
-  const [categories, setCategories] = useState<any[]>([])
+  const { data: categories = [] } = useCategories()
   const selectedCategory = useSelector((state: RootState) => state.filter.selectedCategory)
   const selectedStore = useSelector((state: RootState) => state.filter.selectedStore)
 
@@ -18,19 +18,6 @@ export default function CategoryFilter() {
   const handleClearFilters = () => {
     dispatch(clearFilters())
   }
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('id, name')
-
-      if (data) {
-        setCategories(data)
-      }
-    }
-    fetchCategories()
-  }, [])
 
   return (
     <div className="w-full">

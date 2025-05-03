@@ -96,7 +96,6 @@ export const ShimmerEffect = () => (
 );
 
 const CommentItem = ({ comment }: CommentItemProps) => (
-  console.log(comment),
   
   <div className="flex items-start gap-3 p-3 border-b border-gray-100  hover:bg-gray-50 transition-colors">
     {comment.profiles?.avatar_url ? (

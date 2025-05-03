@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
-
+import { toast } from 'react-toastify'
 const isClient = typeof window !== 'undefined';
+
+import { Post } from '@/types/post';
 
 
 
@@ -152,8 +154,8 @@ export function usePosts(options: {
   return useQuery({
     queryKey: ['posts', categoryId, storeId, regionId],
     queryFn: async () => {
-      let userRegionPosts: any[] = [];
-      let otherRegionPosts: any[] = [];
+      let userRegionPosts: Post[] = [];
+      let otherRegionPosts: Post[] = [];
       
       let base = supabase.from('posts').select(
         `*,author:profiles!user_id(full_name,avatar_url),category:categories!posts_category_id_fkey(name),region:regions!posts_region_id_fkey(name,code)`
@@ -216,7 +218,7 @@ export function usePostComments(postIds: (string | number)[]) {
       return data?.reduce((acc, comment) => {
         acc[comment.post_id] = (acc[comment.post_id] || []).concat(comment);
         return acc;
-      }, {} as Record<number, any[]>);
+      }, {} as Record<number, Comment[]>);
     },
     enabled: postIds.length > 0 && isClient,
   });

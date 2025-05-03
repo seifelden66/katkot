@@ -29,8 +29,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [darkMode]);
 
   return (
-    <html>
-      <body>
         
       <div className="transition-colors duration-300" suppressHydrationWarning>
         <Provider store={store}>
@@ -70,7 +68,5 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </QueryProvider>
         </Provider>
       </div>
-      </body>
-    </html>
   );
 }

@@ -1,9 +1,7 @@
 
 import type { NextConfig } from 'next'
-// ① import the plugin factory
 import createNextIntlPlugin from 'next-intl/plugin'
 
-// Create the base configuration
 const baseConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -22,7 +20,8 @@ const baseConfig: NextConfig = {
   allowedDevOrigins: ['http://192.168.1.111'],
 };
 
-// Create the next-intl plugin
-const nextConfig = createNextIntlPlugin(baseConfig);
+
+const withNextIntl = createNextIntlPlugin();
+const nextConfig = withNextIntl(baseConfig);
 
 export default nextConfig;
