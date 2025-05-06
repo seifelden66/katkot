@@ -99,7 +99,7 @@ const CommentItem = ({ comment }: CommentItemProps) => (
   
   <div className="flex items-start gap-3 p-3 border-b border-gray-100  hover:bg-gray-50 transition-colors">
     {comment.profiles?.avatar_url ? (
-      <img
+      <Image
         src={comment.profiles.avatar_url}
         alt={`${comment.profiles.full_name}'s avatar`}
         width={36}
@@ -151,7 +151,7 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
         <div className="flex items-center gap-3 mb-3">
           <Link href={`/${locale}/profile/${post.user_id}`}>
             {post.author?.avatar_url ? (
-              <img 
+              <Image 
                 src={post.author.avatar_url}
                 alt={`${post.author.full_name}'s avatar`}
                 width={44}
@@ -197,7 +197,7 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
           {post.media_url && (
             <div className="mt-3 rounded-lg overflow-hidden">
               <Link href={`/${locale}/posts/${post.id}`}>
-                {post.media_url.includes('bing.com') ? (
+                {/* {post.media_url.includes('bing.com') ? (
                   <img 
                     src={post.media_url} 
                     alt="Post media content"
@@ -212,7 +212,15 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
                     className="w-full h-auto object-cover max-h-[500px]"
                     unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
                   />
-                )}
+                )} */}
+                 <Image
+                    src={post.media_url}
+                    width={800}
+                    height={600}
+                    alt="Post media content"
+                    className="w-full h-auto object-cover max-h-[500px]"
+                    unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
+                  />
               </Link>
             </div>
           )}
@@ -243,7 +251,7 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
             >
               <div className="flex gap-3">
                 {session.user?.user_metadata?.avatar_url ? (
-                  <img
+                  <Image
                     src={session.user.user_metadata.avatar_url}
                     alt="Your avatar"
                     width={36}

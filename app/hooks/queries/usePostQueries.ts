@@ -475,3 +475,62 @@ export function useToggleReaction() {
     }
   });
 }
+
+// in your hooks file...
+
+export function useFollowersList(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["followers-list", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      const { data: follows, error: followsError } = await supabase
+        .from("follows")
+        .select("follower_id")
+        .eq("following_id", userId);
+
+      if (followsError) throw followsError;
+
+      const ids = follows.map((f) => f.follower_id);
+      if (ids.length === 0) return [];
+
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", ids);
+
+      if (profilesError) throw profilesError;
+      return profiles;
+    },
+    enabled: Boolean(userId) && isClient,
+  });
+}
+
+
+export function useFollowingList(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["following-list", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      const { data: follows, error: followsError } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", userId);
+
+      if (followsError) throw followsError;
+
+      const ids = follows.map((f) => f.following_id);
+      if (ids.length === 0) return [];
+
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", ids);
+
+      if (profilesError) throw profilesError;
+      return profiles;
+    },
+    enabled: Boolean(userId) && isClient,
+  });
+}

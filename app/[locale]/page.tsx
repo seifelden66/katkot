@@ -9,15 +9,19 @@ import {
   usePosts, 
   usePostComments 
 } from '@/app/hooks/queries/usePostQueries'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState, setSelectedCategory, setSelectedStore } from '@/lib/store'
 
 export default function HomePage() {
   const [hasMounted, setHasMounted] = useState(false)
   useEffect(() => { setHasMounted(true) }, [])
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
-  const [selectedStore, setSelectedStore] = useState<number | null>(null)
+
+  const selectedCategory = useSelector((state: RootState) => state.filter.selectedCategory)
+  const selectedStore = useSelector((state: RootState) => state.filter.selectedStore)
+  const dispatch = useDispatch()
+  
   const { session } = useSession()
 
-  // Use the new hooks from usePostQueries
   const { data: categories = [] } = useCategories()
   const { data: stores = [] } = useStores()
   const { data: userProfile } = useUserProfile(session?.user?.id)
@@ -34,6 +38,7 @@ export default function HomePage() {
   if (!hasMounted) {
     return (
       <div className="space-y-6">
+        ؤءئ
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
@@ -63,15 +68,15 @@ export default function HomePage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-2 mb-4">
-        <button onClick={() => setSelectedCategory(null)} className={`px-3 py-1 rounded-full text-sm ${selectedCategory === null ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>All Categories</button>
+        <button onClick={() => dispatch(setSelectedCategory(null))} className={`px-3 py-1 rounded-full text-sm ${selectedCategory === null ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>All Categories</button>
         {categories.map(cat => (
-          <button key={cat.id} onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)} className={`px-3 py-1 rounded-full text-sm ${selectedCategory === cat.id ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>{cat.name}</button>
+          <button key={cat.id} onClick={() => dispatch(setSelectedCategory(selectedCategory === cat.id ? null : cat.id))} className={`px-3 py-1 rounded-full text-sm ${selectedCategory === cat.id ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>{cat.name}</button>
         ))}
       </div>
       <div className="flex flex-wrap gap-2 mb-4">
-        <button onClick={() => setSelectedStore(null)} className={`px-3 py-1 rounded-full text-sm ${selectedStore === null ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>All Stores</button>
+        <button onClick={() => dispatch(setSelectedStore(null))} className={`px-3 py-1 rounded-full text-sm ${selectedStore === null ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>All Stores</button>
         {stores.map(store => (
-          <button key={store.id} onClick={() => setSelectedStore(selectedStore === store.id ? null : store.id)} className={`px-3 py-1 rounded-full text-sm ${selectedStore === store.id ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>{store.name}</button>
+          <button key={store.id} onClick={() => dispatch(setSelectedStore(selectedStore === store.id ? null : store.id))} className={`px-3 py-1 rounded-full text-sm ${selectedStore === store.id ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>{store.name}</button>
         ))}
       </div>
 

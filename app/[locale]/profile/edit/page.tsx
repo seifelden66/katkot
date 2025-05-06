@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 // import Image from 'next/image'
 import { toast } from 'react-toastify'
 import { useLocale } from 'next-intl';
+import Image from 'next/image'
 
 
 export default function EditProfilePage() {
@@ -186,7 +187,7 @@ export default function EditProfilePage() {
           <div className="flex flex-col items-center">
             <div className="mb-4 relative">
               {avatarPreview ? (
-                <img
+                <Image
                   src={avatarPreview}
                   alt="Avatar preview"
                   width={128}
@@ -194,7 +195,7 @@ export default function EditProfilePage() {
                   className="w-32 h-32 rounded-full object-cover border-2 border-white  shadow-sm"
                 />
               ) : avatarUrl ? (
-                <img
+                <Image
                   src={avatarUrl}
                   alt="Current avatar"
                   width={128}

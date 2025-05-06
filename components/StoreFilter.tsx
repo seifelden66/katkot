@@ -1,32 +1,17 @@
 'use client'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedStore } from '@/lib/store'
-import { useEffect, useState } from 'react'
 import type { RootState } from '@/lib/store'
-import { supabase } from '@/lib/supabaseClient'
+import { useStores } from '@/app/hooks/queries/usePostQueries'
 
 export default function StoreFilter() {
   const dispatch = useDispatch()
-  const [stores, setStores] = useState<any[]>([])
+  const { data: stores = [] } = useStores()
   const selectedStore = useSelector((state: RootState) => state.filter.selectedStore)
 
   const handleFilter = (storeId: number | null) => {
     dispatch(setSelectedStore(storeId))
   }
-
-  useEffect(() => {
-    const fetchStores = async () => {
-      const { data, error } = await supabase
-        .from('stores')
-        .select('id, name')
-        .order('name')
-
-      if (data) {
-        setStores(data)
-      }
-    }
-    fetchStores()
-  }, [])
 
   return (
     <div className="w-full">

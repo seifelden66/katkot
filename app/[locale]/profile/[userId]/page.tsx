@@ -1,21 +1,25 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
 import { toast } from 'react-toastify'
 import { useSession } from '@/contexts/SessionContext'
 import { useLocale } from 'next-intl'
 import { useQueryClient } from '@tanstack/react-query'
-import { 
-  useUserProfile, 
-  useUserPosts, 
-  useFollowerCount, 
-  useFollowingCount, 
+import {
+  useUserProfile,
+  useUserPosts,
+  useFollowerCount,
+  useFollowingCount,
   useIsFollowing,
-  useExistingFollow
+  useExistingFollow,
+  useFollowersList, 
+  useFollowingList
 } from '@/app/hooks/queries/usePostQueries'
 import { supabase } from '@/lib/supabaseClient'
+import ProfileHeader from './components/ProfileHeader'
+import ProfilePosts from './components/ProfilePosts'
+import FollowersModal from './components/FollowersModal'
+import Link from 'next/link'
 
 export default function UserProfilePage() {
   const queryClient = useQueryClient()
@@ -24,6 +28,7 @@ export default function UserProfilePage() {
   const { session } = useSession()
   const currentUserId = session?.user?.id
   const locale = useLocale()
+  const [view, setView] = useState<"none" | "followers" | "following">("none")
 
   const {
     data: profile,
@@ -31,6 +36,9 @@ export default function UserProfilePage() {
     error: profileError
   } = useUserProfile(userId)
 
+  const { data: followers = [], isLoading: loadingFollowers } = useFollowersList(userId)
+  const { data: following = [], isLoading: loadingFollowing } = useFollowingList(userId)
+  
   const {
     data: userPosts = [],
     isLoading: isPostsLoading,
@@ -51,62 +59,65 @@ export default function UserProfilePage() {
   const { data: isFollowing = false } = useIsFollowing(userId, currentUserId)
   const { data: existingFollow } = useExistingFollow(currentUserId, userId)
 
-  const handleFollow = async () => {
+  const handleFollow = async (targetUserId = userId) => {
     if (!currentUserId) {
       toast.error('Please login to follow users')
       return
     }
 
-    if (currentUserId === userId) {
+    if (currentUserId === targetUserId) {
       return
     }
 
     try {
-      if (isFollowing) {
+      // Check if already following the target user
+      const { data } = await supabase
+        .from('follows')
+        .select('*')
+        .eq('follower_id', currentUserId)
+        .eq('following_id', targetUserId)
+        .single()
+      
+      const isAlreadyFollowing = !!data
+
+      if (isAlreadyFollowing) {
         const { error } = await supabase
           .from('follows')
           .delete()
           .eq('follower_id', currentUserId)
-          .eq('following_id', userId)
+          .eq('following_id', targetUserId)
 
         if (error) throw error
 
-        await queryClient.invalidateQueries({
-          predicate: (query) => 
-            query.queryKey[0] === 'follower-count' ||
-            query.queryKey[0] === 'isFollowing' ||
-            query.queryKey[0] === 'existingFollow'
-        })
-        
         toast.success('Unfollowed successfully')
       } else {
-        if (!existingFollow) {
-          const { error } = await supabase
-            .from('follows')
-            .insert({
-              follower_id: currentUserId,
-              following_id: userId,
-              created_at: new Date().toISOString()
-            })
-
-          if (error) throw error
-
-          await queryClient.invalidateQueries({
-            predicate: (query) => 
-              query.queryKey[0] === 'follower-count' ||
-              query.queryKey[0] === 'isFollowing' ||
-              query.queryKey[0] === 'existingFollow'
+        const { error } = await supabase
+          .from('follows')
+          .insert({
+            follower_id: currentUserId,
+            following_id: targetUserId,
+            created_at: new Date().toISOString()
           })
-          
-          toast.success('Followed successfully')
-        }
+
+        if (error) throw error
+
+        toast.success('Followed successfully')
       }
+
+      await queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === 'follower-count' ||
+          query.queryKey[0] === 'following-count' ||
+          query.queryKey[0] === 'isFollowing' ||
+          query.queryKey[0] === 'existingFollow' ||
+          query.queryKey[0] === 'followers-list' ||
+          query.queryKey[0] === 'following-list'
+      })
     } catch (error) {
       console.error('Error following/unfollowing:', error)
       toast.error('Failed to update follow status')
     }
   }
-
 
   const loading = isProfileLoading || isPostsLoading
 
@@ -117,14 +128,14 @@ export default function UserProfilePage() {
           <div className="flex items-center gap-6 mb-8">
             <div className="w-24 h-24 rounded-full bg-gray-200 "></div>
             <div className="flex-1">
-              <div className="h-6 bg-gray-200  rounded w-1/4 mb-3"></div>
-              <div className="h-4 bg-gray-200  rounded w-1/3"></div>
+              <div className="h-6 bg-gray-200 rounded w-1/4 mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
             </div>
           </div>
-          <div className="h-4 bg-gray-200  rounded w-full mb-6"></div>
+          <div className="h-4 bg-gray-200 rounded w-full mb-6"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-40 bg-gray-200  rounded"></div>
+              <div key={i} className="h-40 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
@@ -135,12 +146,12 @@ export default function UserProfilePage() {
   if (!profile) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className=" rounded-xl shadow-sm  p-8">
+        <div className="rounded-xl shadow-sm p-8">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
-          <h2 className="text-xl font-bold  mb-2">User not found</h2>
-          <p className="text-gray-500  mb-4">The user you are looking for does not exist or has been removed.</p>
+          <h2 className="text-xl font-bold mb-2">User not found</h2>
+          <p className="text-gray-500 mb-4">The user you are looking for does not exist or has been removed.</p>
           <Link
             href={`/${locale}/`}
             className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md inline-flex items-center"
@@ -154,125 +165,38 @@ export default function UserProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className=" rounded-xl shadow-sm  overflow-hidden mb-8">
-        <div className="p-6">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-6">
-            <div>
-              {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt="Profile picture"
-                  width={96}
-                  height={96}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-white  shadow-sm"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white text-2xl font-bold border-2 border-white  shadow-sm">
-                  {profile.full_name?.charAt(0) || '?'}
-                </div>
-              )}
-            </div>
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-2xl font-bold mb-1">
-                {profile.full_name || 'User'}
-              </h1>
-              
-              {profile.regions && (
-                <div className="mb-3">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">
-                    {profile.regions.name}
-                  </span>
-                </div>
-              )}
-              
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start mb-4">
-                <div className="text-center">
-                  <span className="block text-xl font-bold ">{userPosts.length}</span>
-                  <span className="text-sm text-gray-500 ">Posts</span>
-                </div>
-                <div className="text-center">
-                  <span className="block text-xl font-bold ">{followerCount}</span>
-                  <span className="text-sm text-gray-500 ">Followers</span>
-                </div>
-                <div className="text-center">
-                  <span className="block text-xl font-bold ">{followingCount}</span>
-                  <span className="text-sm text-gray-500 ">Following</span>
-                </div>
-              </div>
-              {currentUserId && currentUserId !== userId && (
-                <button
-                  onClick={handleFollow}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                    isFollowing
-                      ? 'bg-gray-200  text-gray-800  hover:bg-gray-300 '
-                      : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white'
-                  }`}
-                >
-                  {isFollowing ? 'Unfollow' : 'Follow'}
-                </button>
-              )}
-            </div>
-          </div>
+      <ProfileHeader 
+        profile={profile}
+        userPosts={userPosts}
+        followerCount={followerCount}
+        followingCount={followingCount}
+        isFollowing={isFollowing}
+        currentUserId={currentUserId}
+        userId={userId}
+        handleFollow={handleFollow}
+        setView={setView}
+      />
 
-          {profile.bio && (
-            <p className="text-gray-700  mb-4">{profile.bio}</p>
-          )}
-        </div>
-      </div>
+      <h2 className="text-xl font-bold mb-4">Posts</h2>
+      
+      <ProfilePosts 
+        userPosts={userPosts} 
+        locale={locale} 
+      />
 
-      <h2 className="text-xl font-bold  mb-4">Posts</h2>
-
-      {userPosts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {userPosts.map(post => (
-            <Link key={post.id} href={`/${locale}/posts/${post.id}`}>
-              <div className=" rounded-xl shadow-sm  overflow-hidden hover:shadow-md transition-shadow">
-                {post.media_url && (
-                  <div className="h-48 overflow-hidden">
-                    {post.media_url.includes('bing.com') ? (
-                      <img
-                        src={post.media_url}
-                        alt="Post media content"
-                        className="w-full h-auto object-cover max-h-[500px]"
-                      />
-                    ) : (
-                      <Image
-                        src={post.media_url}
-                        width={800}
-                        height={600}
-                        alt="Post media content"
-                        className="w-full h-auto object-cover max-h-[500px]"
-                        unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:') ? true : undefined}
-                      />
-                    )}
-                  </div>
-                )}
-                <div className="p-4">
-                  <p className="text-gray-500  text-sm mb-2">
-                    {new Date(post.created_at).toLocaleDateString()}
-                    {post.category && (
-                      <span className="ml-2 px-2 py-1 bg-purple-100  text-purple-600  rounded-full text-xs">
-                        {post.category.name}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-gray-800  line-clamp-3">{post.content}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <div className=" rounded-xl shadow-sm  p-8 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-          </svg>
-          <h3 className="text-lg font-medium  mb-2">No posts yet</h3>
-          <p className="text-gray-500 ">This user has not created any posts yet.</p>
-        </div>
+      {view !== "none" && (
+        <FollowersModal
+          view={view}
+          setView={setView}
+          followers={followers}
+          following={following}
+          loadingFollowers={loadingFollowers}
+          loadingFollowing={loadingFollowing}
+          locale={locale}
+          currentUserId={currentUserId}
+          handleFollow={handleFollow}
+        />
       )}
     </div>
   )
-
- 
 }
