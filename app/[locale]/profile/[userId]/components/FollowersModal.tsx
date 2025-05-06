@@ -95,6 +95,8 @@ export default function FollowersModal({
                       src={u.avatar_url || "/default-avatar.png"}
                       className="w-8 h-8 rounded-full"
                       alt={u.full_name}
+                      height={32}
+                      width={32}
                     />
                     <span>{u.full_name}</span>
                   </Link>
@@ -124,6 +126,8 @@ export default function FollowersModal({
                       src={u.avatar_url || "/default-avatar.png"}
                       className="w-8 h-8 rounded-full"
                       alt={u.full_name}
+                      width={32}
+                      height={32}
                     />
                     <span>{u.full_name}</span>
                   </Link>

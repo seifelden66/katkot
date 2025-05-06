@@ -17,14 +17,39 @@ import Link from 'next/link'
 import FollowersModal from './[userId]/components/FollowersModal'
 import Image from 'next/image'
 
-// Create ProfileHeader component for own profile
+type ProfileHeaderProps = {
+  profile: {
+    id: string;
+    full_name?: string;
+    avatar_url?: string;
+    bio?: string;
+    regions?: {
+      name: string;
+    };
+  };
+  userPosts: {
+    id: string;
+    media_url?: string;
+    store_name?: string;
+    created_at: string;
+    content: string;
+    description?: string;
+    category?: {
+      name: string;
+    };
+  }[];
+  followerCount: number;
+  followingCount: number;
+  setView: (view: "none" | "followers" | "following") => void;
+}
+
 const ProfileHeader = ({ 
   profile, 
   userPosts, 
   followerCount, 
   followingCount,
   setView
-}) => {
+}: ProfileHeaderProps) => {
   const locale = useLocale()
   
   return (
@@ -97,8 +122,22 @@ const ProfileHeader = ({
   )
 }
 
-// Create ProfilePosts component
-const ProfilePosts = ({ userPosts, locale }) => {
+type ProfilePostsProps = {
+  userPosts: {
+    id: string;
+    media_url?: string;
+    store_name?: string;
+    created_at: string;
+    content: string;
+    description?: string;
+    category?: {
+      name: string;
+    };
+  }[];
+  locale: string;
+}
+
+const ProfilePosts = ({ userPosts, locale }: ProfilePostsProps) => {
   if (userPosts.length > 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

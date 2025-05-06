@@ -11,7 +11,7 @@ import {
   useFollowerCount,
   useFollowingCount,
   useIsFollowing,
-  useExistingFollow,
+  
   useFollowersList, 
   useFollowingList
 } from '@/app/hooks/queries/usePostQueries'
@@ -57,8 +57,7 @@ export default function UserProfilePage() {
   const { data: followerCount = 0 } = useFollowerCount(userId)
   const { data: followingCount = 0 } = useFollowingCount(userId)
   const { data: isFollowing = false } = useIsFollowing(userId, currentUserId)
-  const { data: existingFollow } = useExistingFollow(currentUserId, userId)
-
+  
   const handleFollow = async (targetUserId = userId) => {
     if (!currentUserId) {
       toast.error('Please login to follow users')
@@ -70,7 +69,6 @@ export default function UserProfilePage() {
     }
 
     try {
-      // Check if already following the target user
       const { data } = await supabase
         .from('follows')
         .select('*')

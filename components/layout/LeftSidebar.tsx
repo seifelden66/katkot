@@ -117,7 +117,7 @@ export default function LeftSidebar({
 
         <div className="mt-auto pt-6 border-t border-gray-200 ">
           <div className={`rounded-2xl p-4 shadow-sm`}>
-            {/* <UserGreeting /> */}
+            <UserGreeting />
 
             <div className="flex items-center mt-4 justify-between">
               <button

@@ -3,7 +3,11 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 
 export default function Profile() {
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<{
+    id: string;
+    full_name?: string;
+    bio?: string;
+  } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -27,10 +31,10 @@ export default function Profile() {
     const { error } = await supabase
       .from('profiles')
       .update({
-        full_name: profile.full_name,
-        bio: profile.bio
+        full_name: profile?.full_name,
+        bio: profile?.bio
       })
-      .eq('id', profile.id)
+      .eq('id', profile?.id)
     
     if (error) alert('Update error: ' + error.message)
     else alert('Profile updated!')
@@ -42,13 +46,13 @@ export default function Profile() {
     <form onSubmit={updateProfile} className="space-y-4">
       <input
         type="text"
-        value={profile.full_name || ''}
-        onChange={(e) => setProfile({...profile, full_name: e.target.value})}
+        value={profile?.full_name || ''}
+        onChange={(e) => setProfile(profile ? {...profile, full_name: e.target.value} : null)}
         className="w-full p-2 border rounded"
       />
       <textarea
-        value={profile.bio || ''}
-        onChange={(e) => setProfile({...profile, bio: e.target.value})}
+        value={profile?.bio || ''}
+        onChange={(e) => setProfile(profile ? {...profile, bio: e.target.value} : null)}
         className="w-full p-2 border rounded h-32"
       />
       <button 
