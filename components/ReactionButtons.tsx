@@ -37,7 +37,7 @@ export default function ReactionButtons({ postId }: { postId: string }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [postId]);
+  }, [postId, router]);
 
   const handleReaction = async (type: 'like' | 'dislike') => {
     if (!userId) {

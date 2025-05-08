@@ -182,7 +182,7 @@ export default function RichTextEditor({ onChange, value }: { onChange: (html: s
         alert('Image uploaded, but failed to retrieve public URL. Please check bucket policies.')
       }
     } catch (error: any) {
-      alert(`Failed to upload image: ${error.message || 'Unknown error'}`)
+      alert(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setUploading(false)
     }

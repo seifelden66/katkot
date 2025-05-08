@@ -25,7 +25,7 @@ export default function AuthCallback() {
     }
 
     handleOAuthCallback()
-  }, [])
+  }, [router])
 
   return <div>Loading authentication...</div>
 }
