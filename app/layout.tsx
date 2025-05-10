@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html>
             <head>
                 <link rel="shortcut icon" href="../static/favico.png"  />
-                <title>kkkkk</title>
+                <title>Katkot</title>
             </head>
             <body>{children}</body>
         </html>

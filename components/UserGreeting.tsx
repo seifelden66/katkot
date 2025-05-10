@@ -1,10 +1,12 @@
 'use client'
 import { supabase } from '@/lib/supabaseClient'
 import { useEffect, useState } from 'react'
+import { usePoints } from '@/contexts/PointsContext'
 
 export default function UserGreeting() {
   const [fullName, setFullName] = useState<string>('')
   const [loading, setLoading] = useState(true)
+  const { points, isLoading: pointsLoading } = usePoints()
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -34,7 +36,12 @@ export default function UserGreeting() {
 
   return (
     <div className="text-sm font-medium text-gray-700">
-      Hi, {fullName} 👋
+      <div>Hi, {fullName} 👋</div>
+      {!pointsLoading && (
+        <div className="mt-1 text-xs font-semibold text-purple-600">
+          {points} points available
+        </div>
+      )}
     </div>
   )
 }

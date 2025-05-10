@@ -271,27 +271,20 @@ export function usePrevPostId(postId: string | string[] | undefined) {
 }
 
 
-export function useUserPosts(userId: string | undefined) {
+export function useUserPoints(userId: string | undefined) {
   return useQuery({
-    queryKey: ['user-posts', userId],
+    queryKey: ['userPoints', userId],
     queryFn: async () => {
-      if (!userId) return []
+      if (!userId) return 0;
+      
       const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          author:profiles!user_id (full_name, avatar_url),
-          category:categories!posts_category_id_fkey (name),
-          store_name,
-          description
-        `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-      if (error) {
-        toast.error('Failed to load posts')
-        throw error
-      }
-      return data || []
+        .from('profiles')
+        .select('points_balance')
+        .eq('id', userId)
+        .single();
+      
+      if (error) throw error;
+      return data?.points_balance || 0;
     },
     enabled: !!userId && isClient,
   });
@@ -476,7 +469,98 @@ export function useToggleReaction() {
   });
 }
 
-// in your hooks file...
+export function useModifyPoints() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      delta,
+      type,
+      metadata = {}
+    }: {
+      userId: string;
+      delta: number;
+      type: string;
+      metadata?: Record<string, string | number | boolean>;
+    }) => {
+      const { error } = await supabase.rpc('modify_points', {
+        uid: userId,
+        pts_delta: delta,
+        pts_type: type,
+        meta: metadata,
+      });
+      if (error) throw error;
+      return { delta, type };
+    },
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userId] });
+    }
+  });
+}
+
+
+export function useCreatePost() {
+  const queryClient = useQueryClient();
+  const spendPoints = useModifyPoints();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      content,
+      storeId,
+      categoryId,
+      regionId,
+      isGroup,
+      mediaUrl,
+      affiliateLink
+    }: {
+      userId: string;
+      content: string;
+      storeId: number;
+      categoryId: number;
+      regionId: number;
+      isGroup: boolean;
+      mediaUrl?: string;
+      affiliateLink?: string;
+    }) => {
+      const cost = isGroup ? 50 : 20;
+
+      await spendPoints.mutateAsync({
+        userId,
+        delta: -cost,
+        type: isGroup ? 'spend_group_post' : 'spend_post',
+        metadata: { contentSnippet: content.slice(0, 20) }
+      });
+
+      const { data, error } = await supabase
+        .from('posts')
+        .insert({
+          user_id: userId,
+          content,
+          store_id: storeId,
+          category_id: categoryId,
+          region_id: regionId,
+          media_url: mediaUrl,
+          affiliate_link: affiliateLink,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Post;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast.success('Post created!');
+    },
+    onError: (err: Error | { message: string }) => {
+      toast.error(err.message);
+    }
+  });
+}
+
+
+
 
 export function useFollowersList(userId: string | undefined) {
   return useQuery({

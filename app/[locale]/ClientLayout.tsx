@@ -2,6 +2,7 @@
 
 import '../globals.css';
 import { SessionProvider } from '@/contexts/SessionContext';
+import { PointsProvider } from '@/contexts/PointsContext';
 import { useState, useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '@/lib/store';
@@ -34,36 +35,38 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <Provider store={store}>
           <QueryProvider>
             <SessionProvider>
-              <div className="min-h-screen flex flex-col">
-                <MobileHeader
-                  darkMode={darkMode}
-                  setDarkMode={setDarkMode}
-                  isMobileMenuOpen={isMobileMenuOpen}
-                  setIsMobileMenuOpen={setIsMobileMenuOpen}
-                />
-
-                <div className={`flex flex-row w-full pt-14 lg:pt-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <LeftSidebar
+              <PointsProvider>
+                <div className="min-h-screen flex flex-col">
+                  <MobileHeader
                     darkMode={darkMode}
                     setDarkMode={setDarkMode}
                     isMobileMenuOpen={isMobileMenuOpen}
+                    setIsMobileMenuOpen={setIsMobileMenuOpen}
                   />
 
-                  <main className="flex-1 w-full max-w-full lg:max-w-3xl mx-auto min-h-screen">
-                    <div className="sticky top-14 lg:top-0 z-20 backdrop-blur-md px-4 py-4">
-                      <h1 className="text-xl font-bold text-gray-900 ">home</h1>
+                  <div className={`flex flex-row w-full pt-14 lg:pt-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <LeftSidebar
+                      darkMode={darkMode}
+                      setDarkMode={setDarkMode}
+                      isMobileMenuOpen={isMobileMenuOpen}
+                    />
+
+                    <main className="flex-1 w-full max-w-full lg:max-w-3xl mx-auto min-h-screen">
+                      <div className="sticky top-14 lg:top-0 z-20 backdrop-blur-md px-4 py-4">
+                        <h1 className="text-xl font-bold text-gray-900 ">home</h1>
+                      </div>
+                      <div className="p-4">{children}</div>
+                    </main>
+
+                    <div className="hidden xl:block xl:w-96 flex-shrink-0">
+                      <RightSidebar />
                     </div>
-                    <div className="p-4">{children}</div>
-                  </main>
-
-                  <div className="hidden xl:block xl:w-96 flex-shrink-0">
-                    <RightSidebar />
                   </div>
-                </div>
 
-                <MobileNavigation />
-                <div className="h-16 lg:hidden" />
-              </div>
+                  <MobileNavigation />
+                  <div className="h-16 lg:hidden" />
+                </div>
+              </PointsProvider>
             </SessionProvider>
           </QueryProvider>
         </Provider>
