@@ -1,13 +1,31 @@
 'use client'
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Youtube from '@tiptap/extension-youtube'
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { 
+  BoldIcon, 
+  ItalicIcon, 
+  HeadingIcon, 
+  BulletListIcon, 
+  ImageIcon, 
+  YoutubeIcon 
+} from '@/components/icons/Icons'
 
-const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void }) => {
+interface MenuBarProps {
+  editor: Editor | null;
+  onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+interface RichTextEditorProps {
+  onChange: (html: string) => void;
+  value?: string;
+}
+
+const MenuBar = ({ editor, onImageUpload }: MenuBarProps) => {
   const [showYoutubeInput, setShowYoutubeInput] = useState(false)
   const [youtubeUrl, setYoutubeUrl] = useState('')
 
@@ -42,10 +60,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
         className={`p-2 rounded ${editor.isActive('bold') ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Bold"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
-          <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
-        </svg>
+        <BoldIcon />
       </button>
       <button
         type="button"
@@ -53,11 +68,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
         className={`p-2 rounded ${editor.isActive('italic') ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Italic"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="19" y1="4" x2="10" y2="4"></line>
-          <line x1="14" y1="20" x2="5" y2="20"></line>
-          <line x1="15" y1="4" x2="9" y2="20"></line>
-        </svg>
+        <ItalicIcon />
       </button>
       <button
         type="button"
@@ -65,11 +76,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
         className={`p-2 rounded ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Heading 2"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M6 4v16"></path>
-          <path d="M18 4v16"></path>
-          <path d="M6 12h12"></path>
-        </svg>
+        <HeadingIcon />
       </button>
       <button
         type="button"
@@ -77,14 +84,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
         className={`p-2 rounded ${editor.isActive('bulletList') ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
         title="Bullet List"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
+        <BulletListIcon />
       </button>
       <label className="p-2 rounded bg-white  hover:bg-gray-100  cursor-pointer" title="Upload Image">
         <input
@@ -94,11 +94,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
           onChange={onImageUpload}
           onClick={(e) => (e.currentTarget.value = '')}
         />
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-          <circle cx="8.5" cy="8.5" r="1.5"></circle>
-          <polyline points="21 15 16 10 5 21"></polyline>
-        </svg>
+        <ImageIcon />
       </label>
       <div className="flex items-center gap-1">
         <button
@@ -107,10 +103,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
           className={`p-2 rounded ${showYoutubeInput ? 'bg-gray-200 ' : 'bg-white  hover:bg-gray-100 '}`}
           title="Add YouTube Video"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
-            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-          </svg>
+          <YoutubeIcon />
         </button>
         {showYoutubeInput && (
           <div className="flex items-center gap-1">
@@ -148,7 +141,7 @@ const MenuBar = ({ editor, onImageUpload }: { editor: any; onImageUpload: (event
   )
 }
 
-export default function RichTextEditor({ onChange, value }: { onChange: (html: string) => void; value?: string }) {
+export default function RichTextEditor({ onChange, value }: RichTextEditorProps) {
   const [uploading, setUploading] = useState(false)
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,7 +159,7 @@ export default function RichTextEditor({ onChange, value }: { onChange: (html: s
         throw new Error('You must be logged in to upload images')
       }
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('media')
         .upload(filePath, file, { upsert: false })
 
@@ -181,7 +174,7 @@ export default function RichTextEditor({ onChange, value }: { onChange: (html: s
       } else {
         alert('Image uploaded, but failed to retrieve public URL. Please check bucket policies.')
       }
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       alert(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setUploading(false)
@@ -191,7 +184,12 @@ export default function RichTextEditor({ onChange, value }: { onChange: (html: s
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Image.configure({}),
+      Image.configure({
+        allowBase64: true,
+        HTMLAttributes: {
+          class: 'max-w-full rounded-lg',
+        },
+      }),
       Link.configure({ openOnClick: true, autolink: true, linkOnPaste: true }),
       Youtube.configure({ controls: true, nocookie: true }),
     ],

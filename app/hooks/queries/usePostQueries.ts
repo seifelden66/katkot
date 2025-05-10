@@ -5,7 +5,52 @@ const isClient = typeof window !== 'undefined';
 
 import { Post } from '@/types/post';
 
+interface Comment {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  user?: {
+    full_name: string;
+    avatar_url: string;
+  };
+  author?: {
+    full_name: string;
+    avatar_url: string;
+  };
+}
 
+interface CommentParams {
+  postId: string;
+  userId: string;
+  content: string;
+}
+
+interface ReactionParams {
+  postId: string;
+  userId: string;
+  type: 'like' | 'dislike';
+  previousReaction: string | null;
+}
+
+interface PointsParams {
+  userId: string;
+  delta: number;
+  type: string;
+  metadata?: Record<string, string | number | boolean>;
+}
+
+interface CreatePostParams {
+  userId: string;
+  content: string;
+  storeId: number;
+  categoryId: number;
+  regionId: number;
+  isGroup: boolean;
+  mediaUrl?: string;
+  affiliateLink?: string;
+}
 
 export function usePost(id: string | string[] | undefined) {
   return useQuery({
@@ -66,15 +111,7 @@ export function useAddComment() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ 
-      postId, 
-      userId, 
-      content 
-    }: { 
-      postId: string; 
-      userId: string; 
-      content: string 
-    }) => {
+    mutationFn: async ({ postId, userId, content }: CommentParams) => {
       const { data, error } = await supabase
         .from('comments')
         .insert({
@@ -361,7 +398,6 @@ export function useUsersToFollow(currentUserId: string | undefined) {
 
       const followingIds = followingData?.map(f => f.following_id) || []
       
-      // If there are no following IDs, we need to handle that case
       const notInClause = followingIds.length > 0 
         ? `(${[currentUserId, ...followingIds].join(',')})` 
         : `(${currentUserId})`
@@ -427,17 +463,7 @@ export function useToggleReaction() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ 
-      postId, 
-      userId, 
-      type,
-      previousReaction 
-    }: { 
-      postId: string; 
-      userId: string; 
-      type: 'like' | 'dislike';
-      previousReaction: string | null;
-    }) => {
+    mutationFn: async ({ postId, userId, type, previousReaction }: ReactionParams) => {
       if (previousReaction) {
         await supabase
           .from('reactions')
@@ -473,17 +499,7 @@ export function useModifyPoints() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      userId,
-      delta,
-      type,
-      metadata = {}
-    }: {
-      userId: string;
-      delta: number;
-      type: string;
-      metadata?: Record<string, string | number | boolean>;
-    }) => {
+    mutationFn: async ({ userId, delta, type, metadata = {} }: PointsParams) => {
       const { error } = await supabase.rpc('modify_points', {
         uid: userId,
         pts_delta: delta,
@@ -514,16 +530,7 @@ export function useCreatePost() {
       isGroup,
       mediaUrl,
       affiliateLink
-    }: {
-      userId: string;
-      content: string;
-      storeId: number;
-      categoryId: number;
-      regionId: number;
-      isGroup: boolean;
-      mediaUrl?: string;
-      affiliateLink?: string;
-    }) => {
+    }: CreatePostParams) => {
       const cost = isGroup ? 50 : 20;
 
       await spendPoints.mutateAsync({
