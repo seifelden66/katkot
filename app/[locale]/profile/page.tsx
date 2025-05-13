@@ -6,11 +6,11 @@ import { useLocale } from 'next-intl'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   useUserProfile,
-  useUserPosts,
   useFollowerCount,
   useFollowingCount,
   useFollowersList,
-  useFollowingList
+  useFollowingList,
+  useUserPosts, 
 } from '@/app/hooks/queries/usePostQueries'
 import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
@@ -245,7 +245,6 @@ export default function ProfilePage() {
     }
 
     try {
-      // Check if already following the target user
       const { data } = await supabase
         .from('follows')
         .select('*')

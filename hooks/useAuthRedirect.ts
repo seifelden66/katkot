@@ -12,7 +12,6 @@ export function useAuthRedirect(redirectTo: string = '/') {
   const router = useRouter()
   
   useEffect(() => {
-    // Only redirect after we've checked the session
     if (!isLoading && session) {
       router.push(redirectTo)
     }

@@ -38,15 +38,7 @@ export default function HomePage() {
   if (!hasMounted) {
     return (
       <div className="space-y-6">
-        ؤءئ
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-          </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
-          <p className="text-gray-500 mb-6">There are no posts matching your criteria.</p>
-          <button onClick={() => { setSelectedCategory(null); setSelectedStore(null) }} className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md inline-flex items-center">Reset Filters</button>
-        </div>
+      loading...
       </div>
     )
   }

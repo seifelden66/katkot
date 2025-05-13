@@ -31,7 +31,7 @@ export default function Login() {
             setLoading(false)
         } else {
             Cookies.set('sb-access-token', data.session.access_token, {
-                expires: data.session.expires_in / 86400, // Convert seconds to days
+                expires: data.session.expires_in / 86400, 
                 secure: true,
                 sameSite: 'Lax'
             })
@@ -40,17 +40,18 @@ export default function Login() {
     }
 
     const handleGoogleLogin = async () => {
+        const redirectTo = 
+          `${window.location.origin}/${locale}/auth/callback`
         const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
+          provider: 'google',
+          options: { redirectTo }
         })
-        
         if (error) {
-            setError(error.message)
-        } else if (data?.url) {
-            // Handle OAuth redirect cookie in callback page
-            router.push(data.url)
+          console.error(error)
+        } else if (data.url) {
+          router.push(data.url)
         }
-    }
+      }
 
     return (
         <div dir={isRTL ? 'rtl' : 'ltr'}>

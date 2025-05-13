@@ -308,6 +308,29 @@ export function usePrevPostId(postId: string | string[] | undefined) {
 }
 
 
+export function useUserPosts(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['userPosts', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          category:categories!posts_category_id_fkey(name),
+          store:stores(name)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!userId && isClient,
+  });
+}
+
 export function useUserPoints(userId: string | undefined) {
   return useQuery({
     queryKey: ['userPoints', userId],
@@ -623,5 +646,28 @@ export function useFollowingList(userId: string | undefined) {
       return profiles;
     },
     enabled: Boolean(userId) && isClient,
+  });
+}
+
+export function useCurrentUserProfile() {
+  const queryClient = useQueryClient();
+  
+  return useQuery({
+    queryKey: ['currentUserProfile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: isClient,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

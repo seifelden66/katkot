@@ -42,9 +42,9 @@ export async function POST(request: Request) {
       media_url: body.media_url || null,
       affiliate_link: body.affiliate_link || null,
       user_id: user.id,
-      category_id: body.category_id, // Will use DB default if null
-      store_id: body.store_id, // Add store_id field
-      description: body.description // Add description field
+      category_id: body.category_id, 
+      store_id: body.store_id, 
+      description: body.description 
     })
 
   if (error) {

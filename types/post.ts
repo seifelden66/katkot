@@ -1,4 +1,3 @@
-// Create type definitions in a separate file
 export interface Post {
   id: string;
   content: string;

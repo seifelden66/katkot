@@ -1,45 +1,27 @@
 'use client'
-import { supabase } from '@/lib/supabaseClient'
+import { useSession } from '@/contexts/SessionContext'
+import { useUserProfile } from '@/app/hooks/queries/usePostQueries'
 import { useEffect, useState } from 'react'
-import { usePoints } from '@/contexts/PointsContext'
 
 export default function UserGreeting() {
-  const [fullName, setFullName] = useState<string>('')
-  const [loading, setLoading] = useState(true)
-  const { points, isLoading: pointsLoading } = usePoints()
-
+  const { session } = useSession()
+  const { data: userProfile } = useUserProfile(session?.user?.id)
+  const [isMounted, setIsMounted] = useState(false)
+  
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        setLoading(false)
-        return
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', user.id)
-        .single()
-
-      if (!error && data) {
-        setFullName(data.full_name)
-      }
-      setLoading(false)
-    }
-
-    fetchProfile()
+    setIsMounted(true)
   }, [])
 
-  if (loading) return <div className="animate-pulse">Loading...</div>
-  if (!fullName) return null
+  if (!isMounted) {
+    return <div className="text-sm font-medium text-gray-700">Loading...</div>
+  }
 
   return (
     <div className="text-sm font-medium text-gray-700">
-      <div>Hi, {fullName} 👋</div>
-      {!pointsLoading && (
+      <div>Hi, {userProfile?.full_name || 'Guest'} 👋</div>
+      {userProfile && (
         <div className="mt-1 text-xs font-semibold text-purple-600">
-          {points} points available
+          {userProfile?.points_balance} points available
         </div>
       )}
     </div>
