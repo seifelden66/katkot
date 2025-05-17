@@ -4,12 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
-import { useQuery } from '@tanstack/react-query'
+import { useRegions } from '@/app/hooks/queries/usePostQueries'
 
-interface Region {
-  id: number;
-  name: string;
-}
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -24,72 +20,8 @@ export default function Register() {
   const isRTL = locale === 'ar'
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) 
   
-  const { data: regions = [] } = useQuery<Region[]>({
-    queryKey: ['regions'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('regions')
-        .select('id, name')
-        .order('name', { ascending: true })
-      
-      if (error) {
-        console.error('Error fetching regions:', error)
-        throw error
-      }
-      return data || []
-    }
-  })
+  const { data: regions = [] } = useRegions()
   
-  // const handleRegister = async (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   setLoading(true)
-  //   setError('')
-  //   setMessage('')
-
-  //   try {
-  //     // First check if email exists
-  //     const { data: existingUsers } = await supabase
-  //       .from('auth.users')
-  //       .select('email')
-  //       .eq('email', email)
-  //       .limit(1)
-      
-  //     if (existingUsers && existingUsers.length > 0) {
-  //       setError('This email is already registered')
-  //       setLoading(false)
-  //       return
-  //     }
-
-  //     // If email doesn't exist, proceed with signup
-  //     const { data, error: signUpError } = await supabase.auth.signUp({
-  //       email,
-  //       password,
-  //       options: {
-  //         data: {
-  //           fullName,
-  //           regionId: selectedRegionId
-  //         }
-  //       }
-  //     })
-
-  //     if (signUpError) {
-  //       setError(signUpError.message)
-  //     } else if (data.user) {
-  //       if (data.session) {
-  //         // Successfully signed in, redirect to dashboard
-  //         router.push('/dashboard')
-  //       } else {
-  //         // Email confirmation required
-  //         setMessage('Please check your email to confirm your account')
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error('Registration error:', err)
-  //     setError('An unexpected error occurred')
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)

@@ -4,6 +4,7 @@ import PostCard from '@/components/PostCard'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocale } from 'next-intl'
 import { usePost, useStore, useNextPostId, usePrevPostId } from '@/app/hooks/queries/usePostQueries'
+import { useIsMounted } from '@/hooks/useIsMounted'
 
 const PostSkeleton = () => (
   <div className="max-w-3xl mx-auto py-8 px-4 animate-pulse">
@@ -40,11 +41,7 @@ function RichContent({ content }: { content: string }) {
 }
 
 export default function PostPage() {
-  const [isMounted, setIsMounted] = useState(false)
-  
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useIsMounted()
   
   const params = useParams()
   const router = useRouter()

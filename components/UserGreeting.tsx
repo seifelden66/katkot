@@ -1,17 +1,13 @@
 'use client'
 import { useSession } from '@/contexts/SessionContext'
 import { useUserProfile } from '@/app/hooks/queries/usePostQueries'
-import { useEffect, useState } from 'react'
+import { useIsMounted } from '@/hooks/useIsMounted'
 
 export default function UserGreeting() {
   const { session } = useSession()
   const { data: userProfile } = useUserProfile(session?.user?.id)
-  const [isMounted, setIsMounted] = useState(false)
+  const isMounted = useIsMounted()
   
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   if (!isMounted) {
     return <div className="text-sm font-medium text-gray-700">Loading...</div>
   }

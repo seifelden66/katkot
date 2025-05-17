@@ -1,6 +1,4 @@
 'use client'
-import { useState, useEffect } from 'react'
-import PostCard from '@/components/PostCard'
 import { useSession } from '@/contexts/SessionContext'
 import { 
   useCategories, 
@@ -11,10 +9,11 @@ import {
 } from '@/app/hooks/queries/usePostQueries'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, setSelectedCategory, setSelectedStore } from '@/lib/store'
+import PostCard from '@/components/PostCard'
+import { useIsMounted } from '@/hooks/useIsMounted'
 
 export default function HomePage() {
-  const [hasMounted, setHasMounted] = useState(false)
-  useEffect(() => { setHasMounted(true) }, [])
+  const hasMounted = useIsMounted()
 
   const selectedCategory = useSelector((state: RootState) => state.filter.selectedCategory)
   const selectedStore = useSelector((state: RootState) => state.filter.selectedStore)
