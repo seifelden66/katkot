@@ -1,6 +1,6 @@
 {
     "hello": "Hello",
-    "NotFound":{
+    "NotFound": {
         "title": "Page Not Found",
         "description": "The page you are looking for does not exist.",
         "goHome": "Go Home"
@@ -55,5 +55,11 @@
         "dontHaveAccount": "Don't have an account?",
         "alreadyHaveAccount": "Already have an account?",
         "google": "Google"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "clearAll": "Clear All",
+        "noNotifications": "You have no notifications",
+        "delete": "Delete notification"
     }
 }

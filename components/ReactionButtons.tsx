@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { usePostReactions, useToggleReaction } from '@/app/hooks/queries/usePostQueries'
 import { supabase } from '@/lib/supabaseClient'
+import { createNotification } from '@/lib/notifications'
 
 export default function ReactionButtons({ postId }: { postId: string }) {
   const session = useSession()
@@ -46,12 +47,27 @@ export default function ReactionButtons({ postId }: { postId: string }) {
     }
 
     try {
+      const { data: post } = await supabase
+        .from('posts')
+        .select('user_id')
+        .eq('id', postId)
+        .single()
+        
       toggleReaction.mutate({
         postId,
         userId,
         type,
         previousReaction: userReaction
       });
+      
+      if (type === 'like' && userReaction !== 'like' && post) {
+        await createNotification({
+          userId: post.user_id,
+          actorId: userId,
+          type: 'like',
+          postId
+        })
+      }
     } catch (error) {
       console.error('Reaction error:', error)
     }

@@ -14,6 +14,7 @@ import {
   SunIcon, 
   MoonIcon 
 } from '@/components/icons/Icons'
+import NotificationBadge from '../NotificationBadge';
 
 
 type LeftSidebarProps = {
@@ -93,6 +94,7 @@ export default function LeftSidebar({
           {navLinks.map((link, index) => {
             if (link.requiresAuth && !session) return null;
             const isCreatePost = link.name === 'Create Post';
+            const isNotifications = link.name === 'Notifications';
             
             return (
               <Link
@@ -104,8 +106,10 @@ export default function LeftSidebar({
                     : `flex items-center px-5 py-3 ${darkMode ? 'text-gray-200' : 'text-gray-700'} rounded-full ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-purple-50'} transition-colors`
                 }
               >
-                <div className={isCreatePost ? '' : `${darkMode ? 'bg-gray-800' : 'bg-purple-100'} p-2 rounded-full`}>
+                
+                <div className={isCreatePost ? '' : `${darkMode ? 'bg-gray-800' : 'bg-purple-100'} p-2 rounded-full relative`}>
                   {link.icon}
+                  {isNotifications && <NotificationBadge />}
                 </div>
                 <span className={`text-base font-medium ${isCreatePost ? 'ml-3' : 'ml-4'} ${isRTL ? 'mr-4 ml-0' : ''}`}>
                   {t(`nav.${link.name.toLowerCase().replace(' ', '_')}`)}

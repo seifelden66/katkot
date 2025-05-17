@@ -20,6 +20,7 @@ import ProfileHeader from './components/ProfileHeader'
 import ProfilePosts from './components/ProfilePosts'
 import FollowersModal from './components/FollowersModal'
 import Link from 'next/link'
+import { createNotification } from '@/lib/notifications'
 
 export default function UserProfilePage() {
   const queryClient = useQueryClient()
@@ -98,6 +99,12 @@ export default function UserProfilePage() {
           })
 
         if (error) throw error
+
+        await createNotification({
+          userId: targetUserId,
+          actorId: currentUserId,
+          type: 'follow'
+        })
 
         toast.success('Followed successfully')
       }

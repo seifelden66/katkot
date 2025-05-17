@@ -1,17 +1,9 @@
 'use client'
 import { useParams, useRouter } from 'next/navigation'
 import PostCard from '@/components/PostCard'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useLocale } from 'next-intl'
-
-// interface Store {
-//   id: string;
-//   name: string;
-//   description?: string;
-//   website?: string;
-//   created_at?: string;
-//   updated_at?: string;
-// }
+import { usePost, useStore, useNextPostId, usePrevPostId } from '@/app/hooks/queries/usePostQueries'
 
 const PostSkeleton = () => (
   <div className="max-w-3xl mx-auto py-8 px-4 animate-pulse">
@@ -23,11 +15,37 @@ const PostSkeleton = () => (
   </div>
 )
 
-
-
-import { usePost,  useStore, useNextPostId, usePrevPostId } from '@/app/hooks/queries/usePostQueries';
+function RichContent({ content }: { content: string }) {
+  const [processedContent, setProcessedContent] = useState('')
+  
+  useEffect(() => {
+    const processed = content
+      .replace(/<img(.+?)>/g, '<div class="my-4 overflow-hidden rounded-lg"><img$1 class="w-full h-auto object-cover" /></div>')
+      .replace(/<iframe(.+?)><\/iframe>/g, '<div class="my-4 aspect-video overflow-hidden rounded-lg"><iframe$1 class="w-full h-full" allowfullscreen></iframe></div>')
+      .replace(/<video(.+?)><\/video>/g, '<div class="my-4 overflow-hidden rounded-lg"><video$1 class="w-full h-auto" controls></video></div>')
+    
+    setProcessedContent(processed)
+  }, [content])
+  
+  if (!processedContent) {
+    return <div className="animate-pulse h-32 bg-gray-100 rounded-lg"></div>
+  }
+  
+  return (
+    <div 
+      className="rich-content prose prose-sm md:prose-base max-w-none"
+      dangerouslySetInnerHTML={{ __html: processedContent }}
+    />
+  )
+}
 
 export default function PostPage() {
+  const [isMounted, setIsMounted] = useState(false)
+  
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+  
   const params = useParams()
   const router = useRouter()
   const postId = params?.id as string
@@ -37,28 +55,22 @@ export default function PostPage() {
     data: post,
     isLoading: isPostLoading,
     error: postError
-  } = usePost(postId);
+  } = usePost(postId)
 
   const {
     data: store,
     error: storeError
-  } = useStore(post?.store_id);
-
-  // const {
-  //   data: comments = [],
-  //   error: commentsError
-  // } = useComments(postId);
+  } = useStore(post?.store_id)
 
   const {
     data: nextPostId,
     error: nextPostError
-  } = useNextPostId(postId);
+  } = useNextPostId(postId)
 
   const {
     data: prevPostId,
     error: prevPostError
-  } = usePrevPostId(postId);
-
+  } = usePrevPostId(postId)
 
   useEffect(() => {
     if (!postId) {
@@ -78,6 +90,8 @@ export default function PostPage() {
     }
   }, [router, locale, isPostLoading])
 
+  if (!isMounted) return null
+  
   if (isPostLoading) return <PostSkeleton />
 
   if (postError) {
@@ -164,15 +178,7 @@ export default function PostPage() {
         <div className="mt-6">
           <h3 className="text-lg font-medium mb-2">Description</h3>
           <div className="p-4 rounded-lg shadow-sm">
-            <div
-              className="rich-content prose prose-sm md:prose-base max-w-none"
-              dangerouslySetInnerHTML={{
-                __html: post.description
-                  .replace(/<img(.+?)>/g, '<div class="my-4 overflow-hidden rounded-lg"><img$1 class="w-full h-auto object-cover" /></div>')
-                  .replace(/<iframe(.+?)><\/iframe>/g, '<div class="my-4 aspect-video overflow-hidden rounded-lg"><iframe$1 class="w-full h-full" allowfullscreen></iframe></div>')
-                  .replace(/<video(.+?)><\/video>/g, '<div class="my-4 overflow-hidden rounded-lg"><video$1 class="w-full h-auto" controls></video></div>')
-              }}
-            />
+            <RichContent content={post.description} />
           </div>
         </div>
       )}

@@ -41,8 +41,8 @@
       "username": "اسم المستخدم",
       "button": "متابعة"
     }
-},
-"auth": {
+  },
+  "auth": {
     "email": "الايميل",
     "password": "الرقم العام",
     "fullName": "الاسم كامل",
@@ -55,5 +55,11 @@
     "dontHaveAccount": "لا يوجد لديك حساب؟",
     "alreadyHaveAccount": "هل لديك حساب؟",
     "google": "جوجل"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "clearAll": "حذف الكل",
+    "noNotifications": "ليس لديك إشعارات",
+    "delete": "حذف الإشعار"
   }
 }

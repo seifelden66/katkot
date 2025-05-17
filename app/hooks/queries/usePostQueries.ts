@@ -650,7 +650,7 @@ export function useFollowingList(userId: string | undefined) {
 }
 
 export function useCurrentUserProfile() {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   
   return useQuery({
     queryKey: ['currentUserProfile'],
@@ -668,6 +668,125 @@ export function useCurrentUserProfile() {
       return data;
     },
     enabled: isClient,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
+  });
+}
+
+
+interface Notification {
+  id: number
+  created_at: string
+  type: string
+  read: boolean
+  post_id?: string
+  actor: {
+    id: string
+    full_name: string
+    avatar_url: string
+  }
+  posts?: {
+    content: string
+  }
+}
+
+export function useNotifications(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['notifications', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      
+      const { data, error } = await supabase
+        .from('notifications')
+        .select(`
+          *,
+          actor:actor_id(id, full_name, avatar_url),
+          posts:post_id(content)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      }
+      
+      return data as Notification[] || [];
+    },
+    enabled: !!userId && isClient,
+  });
+}
+
+export function useMarkNotificationsAsRead() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (notificationIds: number[]) => {
+      if (notificationIds.length === 0) return;
+      
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .in('id', notificationIds);
+        
+      if (error) throw error;
+    },
+    onSuccess: (_, variables, context) => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
+}
+
+export function useDeleteNotification() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (notificationId: number) => {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
+}
+
+export function useDeleteAllNotifications() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', userId);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
+}
+
+export function useUnreadNotificationsCount(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['unreadNotificationsCount', userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('read', false);
+        
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!userId && isClient,
   });
 }
