@@ -43,17 +43,7 @@ export default function RightSidebar() {
 
   const handleFollow = (userId: string) => {
     if (!currentUserId) {
-      // toast(
-      //   <div className="flex flex-col">
-      //     <p className="mb-2">You need to be logged in to follow users</p>
-      //     <Link 
-      //       href={`/${locale}/auth/login`}
-      //       className="self-start bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium"
-      //     >
-      //       Sign in
-      //     </Link>
-      //   </div>
-      // )
+      toast.error('You must be logged in to follow users')
       return
     }
     followUser(userId)
