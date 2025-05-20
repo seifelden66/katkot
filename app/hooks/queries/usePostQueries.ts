@@ -730,7 +730,7 @@ export function useMarkNotificationsAsRead() {
         
       if (error) throw error;
     },
-    onSuccess: (_, variables, context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     }
   });
