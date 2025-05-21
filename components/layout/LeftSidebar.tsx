@@ -82,7 +82,10 @@ export default function LeftSidebar({
   return (
     <aside
       className={`fixed lg:sticky top-0 h-screen lg:flex flex-col w-72 border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'} z-30 transform transition-transform duration-300 ease-in-out overflow-y-auto
-      ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+      ${isRTL 
+        ? (isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0') 
+        : (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')}
+      ${isRTL ? 'right-0 lg:right-auto' : 'left-0 lg:left-auto'}`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div className={`flex flex-col h-full pt-20 lg:p-6 ${darkMode ? 'bg-gray-900 lg:bg-inherit' : 'bg-gray-200 lg:bg-inherit'}`}>
@@ -107,11 +110,11 @@ export default function LeftSidebar({
                 }
               >
                 
-                <div className={isCreatePost ? '' : `${darkMode ? 'bg-gray-800' : 'bg-purple-100'} p-2 rounded-full relative`}>
+                <div className={`${isCreatePost ? '' : `${darkMode ? 'bg-gray-800' : 'bg-purple-100'} p-2 rounded-full relative`} ${isRTL ? 'ml-3' : 'mr-3'}`}>
                   {link.icon}
                   {isNotifications && <NotificationBadge />}
                 </div>
-                <span className={`text-base font-medium ${isCreatePost ? 'ml-3' : 'ml-4'} ${isRTL ? 'mr-4 ml-0' : ''}`}>
+                <span className={`text-base font-medium ${isCreatePost ? (isRTL ? 'mr-3' : 'ml-3') : (isRTL ? 'mr-4' : 'ml-4')}`}>
                   {t(`nav.${link.name.toLowerCase().replace(' ', '_')}`)}
                 </span>
               </Link>

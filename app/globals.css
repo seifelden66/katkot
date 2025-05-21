@@ -42,3 +42,18 @@ body {
   margin-top: 1.25em;
   margin-bottom: 0.75em;
 }
+/* Add to your globals.css */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl .mobile-menu {
+  left: auto;
+  right: 0;
+  transform: translateX(100%);
+}
+
+.rtl .mobile-menu.open {
+  transform: translateX(0);
+}
