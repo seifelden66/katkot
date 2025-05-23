@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import Input from './atoms/Input'
+import Button from './atoms/Button'
 
 export default function Profile() {
   const [profile, setProfile] = useState<{
@@ -44,23 +46,22 @@ export default function Profile() {
 
   return (
     <form onSubmit={updateProfile} className="space-y-4">
-      <input
+      <Input
         type="text"
         value={profile?.full_name || ''}
         onChange={(e) => setProfile(profile ? {...profile, full_name: e.target.value} : null)}
-        className="w-full p-2 border rounded"
       />
       <textarea
         value={profile?.bio || ''}
         onChange={(e) => setProfile(profile ? {...profile, bio: e.target.value} : null)}
         className="w-full p-2 border rounded h-32"
       />
-      <button 
+      <Button 
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        variant="primary"
       >
         Update Profile
-      </button>
+      </Button>
     </form>
   )
 }

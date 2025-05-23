@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRegions } from '@/app/hooks/queries/usePostQueries'
-
+import Input from './atoms/Input'
+import Button from './atoms/Button'
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -64,32 +65,29 @@ export default function Register() {
       <div className="space-y-4">
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <input
+            <Input
               type="text"
               placeholder={t('fullName')}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full p-2 border rounded"
               required
             />
           </div>
           <div>
-            <input
+            <Input
               type="email"
               placeholder={t('email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded"
               required
             />
           </div>
           <div>
-            <input
+            <Input
               type="password"
               placeholder={t('password')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded"
               required
             />
           </div>
@@ -110,13 +108,14 @@ export default function Register() {
             </select>
           </div>
           
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+            variant="primary"
+            className="w-full"
           >
             {loading ? t('loading') : t('createAccount')}
-          </button>
+          </Button>
         </form>
 
         <p className="text-center text-sm text-gray-600">

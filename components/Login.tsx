@@ -5,6 +5,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Cookies from 'js-cookie'
+import Input from './atoms/Input';
+import Button from './atoms/Button';
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -51,39 +53,38 @@ export default function Login() {
         } else if (data.url) {
           router.push(data.url)
         }
-      }
+    }
 
     return (
         <div dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="space-y-4">
                 <form onSubmit={handleEmailLogin} className="space-y-4">
                     <div>
-                        <input
+                        <Input
                             type="email"
                             placeholder={t('email')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 border rounded"
                             required
                         />
                     </div>
                     <div>
-                        <input
+                        <Input
                             type="password"
                             placeholder={t('password')}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 border rounded"
                             required
                         />
                     </div>
-                    <button
+                    <Button
                         type="submit"
+                        variant="primary"
                         disabled={loading}
-                        className="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+                        className="w-full"
                     >
                         {loading ? t('loading') : t('signIn')}
-                    </button>
+                    </Button>
                 </form>
 
                 <div className="relative">

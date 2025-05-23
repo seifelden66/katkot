@@ -790,3 +790,40 @@ export function useUnreadNotificationsCount(userId: string | undefined) {
     enabled: !!userId && isClient,
   });
 }
+
+
+export function useSearch(q: string) {
+  return useQuery({
+    queryKey: ['search', q],
+    // only run if the query is ≥ 2 chars
+    enabled: q.trim().length >= 2,
+    queryFn: async () => {
+      // —— USERS BY NAME ONLY ——
+      const { data: users, error: usersError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .ilike('full_name', `%${q}%`)
+        .limit(5)
+
+      // —— POSTS AS-BEFORE ——
+      const { data: posts, error: postsError } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          author:profiles!user_id(id, full_name, avatar_url)
+        `)
+        .ilike('content', `%${q}%`)
+        .order('created_at', { ascending: false })
+        .limit(10)
+
+      if (usersError || postsError) {
+        throw new Error(usersError?.message || postsError?.message)
+      }
+
+      return { users: users || [], posts: posts || [] }
+    }
+  })
+}

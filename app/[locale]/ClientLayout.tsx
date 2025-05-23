@@ -85,7 +85,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   />
 
                   <div className={`flex w-full pt-14 lg:pt-0 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-                    {/* Left sidebar - will appear on right in RTL */}
                     <div ref={sidebarRef} className={`${isRTL ? 'order-3 lg:order-3' : 'order-1 lg:order-1'}`}>
                       <LeftSidebar
                         darkMode={darkMode}
@@ -94,7 +93,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       />
                     </div>
 
-                    {/* Main content - always in the middle */}
                     <main className={`flex-1 w-full max-w-full lg:max-w-3xl mx-auto min-h-screen order-2 lg:order-2`}>
                       <div className="sticky top-14 lg:top-0 z-20 backdrop-blur-md px-4 py-4">
                         <h1 className="text-xl font-bold text-gray-900">home</h1>
@@ -102,7 +100,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       <div className="p-4">{children}</div>
                     </main>
 
-                    {/* Right sidebar - will appear on left in RTL */}
                     <div className={`hidden xl:block xl:w-96 flex-shrink-0 ${isRTL ? 'order-1 lg:order-1' : 'order-3 lg:order-3'}`}>
                       <RightSidebar />
                     </div>

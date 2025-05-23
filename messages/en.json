@@ -25,7 +25,25 @@
             "signOut": "Sign Out"
         },
         "search": {
-            "placeholder": "Search Katkot"
+            "title": "Search",
+            "placeholder": "Search Katkot",
+            "noResults": "No results found for",
+            "allResults": "All Results",
+            "users": "Users",
+            "posts": "Posts",
+            "filterByCategory": "Filter by Category",
+            "filterByStore": "Filter by Store",
+            "trendingTopics": "Trending Topics",
+            "viewAll": "View all results",
+            "loading": "Loading...",
+            "whoToFollow": "Who to Follow",
+            "follow": "Follow",
+            "noSuggestions": "No suggestions available",
+            "signInToSee": "Sign in to see suggestions",
+            "trendingTopic": "Trending Topic {{number}}",
+            "mustBeLoggedIn": "You must be logged in to follow users",
+            "followSuccess": "Successfully followed user",
+            "followError": "Error following user: "
         },
         "filters": {
             "category": "Filter by Category",

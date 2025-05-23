@@ -1,8 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { SunIcon, MoonIcon, MenuIcon, CloseIcon } from '@/components/icons/Icons'
+import { useRouter } from 'next/navigation'
+import { SunIcon, MoonIcon, MenuIcon, CloseIcon, SearchIcon } from '@/components/icons/Icons'
 import { useLocale } from 'next-intl';
-
 
 type MobileHeaderProps = {
   darkMode: boolean;
@@ -18,6 +18,11 @@ export default function MobileHeader({
   setIsMobileMenuOpen 
 }: MobileHeaderProps) {
   const locale = useLocale();
+  const router = useRouter();
+
+  const handleSearchClick = () => {
+    router.push(`/${locale}/search`);
+  };
 
   return (
     <header className="lg:hidden fixed top-0 left-0 right-0 z-40 border-b border-gray-100 px-4 py-3 flex justify-between items-center">
@@ -27,15 +32,21 @@ export default function MobileHeader({
 
       <div className="flex items-center gap-3">
         <button
+          onClick={handleSearchClick}
+          className="p-2 rounded-full bg-gray-100"
+        >
+          <SearchIcon />
+        </button>
+        <button
           onClick={() => setDarkMode(!darkMode)}
-          className="p-2 rounded-full bg-gray-100 "
+          className="p-2 rounded-full bg-gray-100"
         >
           {darkMode ? <SunIcon /> : <MoonIcon />}
         </button>
 
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-full bg-gray-100 "
+          className="p-2 rounded-full bg-gray-100"
         >
           {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
         </button>

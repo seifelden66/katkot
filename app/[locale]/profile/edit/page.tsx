@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { useLocale } from 'next-intl';
 import Image from 'next/image'
+import Button from '@/components/atoms/Button'
+import Input from '@/components/atoms/Input'
 
 
 export default function EditProfilePage() {
@@ -221,21 +223,20 @@ export default function EditProfilePage() {
           
           <div className="flex-1 space-y-4">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700  mb-1">
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
                 Full Name
               </label>
-              <input
+              <Input
                 type="text"
                 id="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full p-2 border rounded  "
                 placeholder="Your full name"
               />
             </div>
             
             <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700  mb-1">
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
                 Bio
               </label>
               <textarea
@@ -243,20 +244,20 @@ export default function EditProfilePage() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={4}
-                className="w-full p-2 border rounded  "
+                className="w-full p-2 border rounded"
                 placeholder="Tell us about yourself"
               />
             </div>
             
             <div>
-              <label htmlFor="region" className="block text-sm font-medium text-gray-700  mb-1">
+              <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-1">
                 Region
               </label>
               <select
                 id="region"
                 value={selectedRegionId || ''}
                 onChange={(e) => setSelectedRegionId(e.target.value ? Number(e.target.value) : null)}
-                className="w-full p-2 border rounded  "
+                className="w-full p-2 border rounded"
               >
                 <option value="">Select your region</option>
                 {regions.map((region) => (
@@ -265,7 +266,7 @@ export default function EditProfilePage() {
                   </option>
                 ))}
               </select>
-              <p className="mt-1 text-xs text-gray-500 ">
+              <p className="mt-1 text-xs text-gray-500">
                 Your region helps us show you relevant content
               </p>
             </div>
@@ -273,22 +274,21 @@ export default function EditProfilePage() {
         </div>
         
         <div className="flex justify-end">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => router.push('/' + locale + '/profile')}
-            className="px-4 py-2 border border-gray-300 rounded-full text-gray-700  mr-2 hover:bg-gray-50 transition-colors"
+            className="mr-2"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
+            variant="primary"
             disabled={saving}
-            className={`px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full ${
-              saving ? 'opacity-70 cursor-not-allowed' : 'hover:from-purple-600 hover:to-blue-600'
-            } transition-colors shadow-md`}
           >
             {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

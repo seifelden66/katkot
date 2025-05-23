@@ -8,6 +8,8 @@ import RichTextEditor from './RichTextEditor'
 import { toast } from 'react-toastify'
 import { useCategories, useRegions, useStores, useModifyPoints } from '@/app/hooks/queries/usePostQueries'
 import { usePoints } from '@/contexts/PointsContext'
+import Input from './atoms/Input'
+import Button from './atoms/Button'
 
 export default function CreatePost() {
   const locale = useLocale()
@@ -142,19 +144,17 @@ export default function CreatePost() {
         placeholder="What's on your mind?"
         className="w-full p-2 border rounded h-32"
       />
-      <input
+      <Input
         type="url"
         value={media_url}
         onChange={e => setMedia(e.target.value)}
         placeholder="Media URL"
-        className="w-full p-2 border rounded"
       />
-      <input
+      <Input
         type="url"
         value={affiliateLink}
         onChange={e => setAffiliateLink(e.target.value)}
         placeholder="Affiliate link (optional)"
-        className="w-full p-2 border rounded"
       />
       <RichTextEditor onChange={setDescription} value={description} />
       <select
@@ -169,13 +169,14 @@ export default function CreatePost() {
         ))}
       </select>
       {error && <p className="text-red-500">{error}</p>}
-      <button
+      <Button
         type="submit"
+        variant="primary"
         disabled={createPost.isPending}
-        className="w-full py-2 px-4 bg-purple-600 text-white rounded"
+        className="w-full"
       >
         {createPost.isPending ? 'Creating…' : 'Create Post (20 pts)'}
-      </button>
+      </Button>
     </form>
   )
 }

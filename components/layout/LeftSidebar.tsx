@@ -153,7 +153,6 @@ export default function LeftSidebar({
             </div>
             
             <div className="flex items-center mt-3 justify-between">
-              {/* {session?.user.email} */}
               {session ? (
                 <button
                   onClick={signOut}
