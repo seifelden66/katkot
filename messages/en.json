@@ -61,6 +61,7 @@
         }
     },
     "auth": {
+        "region":"Region",
         "email": "Email",
         "password": "Password",
         "fullName": "Full Name",
@@ -72,7 +73,8 @@
         "orContinueWith": "Or continue with",
         "dontHaveAccount": "Don't have an account?",
         "alreadyHaveAccount": "Already have an account?",
-        "google": "Google"
+        "google": "Google",
+        "welcome":"Welcome to Katkot"
     },
     "notifications": {
         "title": "Notifications",

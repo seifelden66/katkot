@@ -1,6 +1,6 @@
 'use client';
 
-import '../globals.css';
+import '../../globals.css';
 import { SessionProvider } from '@/contexts/SessionContext';
 import { PointsProvider } from '@/contexts/PointsContext';
 import { useState, useEffect, useRef } from 'react';
@@ -15,6 +15,7 @@ import QueryProvider from '@/app/providers/QueryProvider';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const locale = useLocale();
   const isRTL = locale === 'ar';
@@ -39,7 +40,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       document.dir = 'ltr';
     }
     
-    // Add a class to handle RTL-specific layout issues
     if (isRTL) {
       document.documentElement.classList.add('rtl-layout');
     } else {

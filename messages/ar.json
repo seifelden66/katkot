@@ -51,6 +51,7 @@
     }
   },
   "auth": {
+    "region":"المنطقة",
     "email": "الايميل",
     "password": "الرقم العام",
     "fullName": "الاسم كامل",
@@ -62,7 +63,8 @@
     "orContinueWith": "أو قم بالتسجيل باستخدام",
     "dontHaveAccount": "لا يوجد لديك حساب؟",
     "alreadyHaveAccount": "هل لديك حساب؟",
-    "google": "جوجل"
+    "google": "جوجل",
+    "welcome":"مرحبا بك قي قطقوط"
   },
   "notifications": {
     "title": "الإشعارات",

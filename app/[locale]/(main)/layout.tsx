@@ -2,7 +2,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import ClientLayout from './ClientLayout';
-import '../globals.css';
+import '../../globals.css';
 
 // export const metadata = {
 //   icons: {

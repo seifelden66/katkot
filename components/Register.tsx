@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
-import { useRegions } from '@/app/hooks/queries/usePostQueries'
+// import { useRegions } from '@/app/hooks/queries/usePostQueries'
 import Input from './atoms/Input'
 import Button from './atoms/Button'
 
@@ -19,9 +19,9 @@ export default function Register() {
   const locale = useLocale()
   const t = useTranslations('auth')
   const isRTL = locale === 'ar'
-  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(1) 
+const selectedRegionId = 1
   
-  const { data: regions = [] } = useRegions()
+  // const { data: regions = [] } = useRegions()
   
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -92,7 +92,7 @@ export default function Register() {
             />
           </div>
           
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium mb-2">{t('region')}</label>
             <select
               value={selectedRegionId || 1}
@@ -106,7 +106,7 @@ export default function Register() {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
           
           <Button
             type="submit"
