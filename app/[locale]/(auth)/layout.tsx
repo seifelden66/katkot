@@ -4,11 +4,14 @@ import { getTranslations } from "next-intl/server";
 
 export default async function AuthLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  // Await the params in Next.js 15
+  const { locale } = await params;
+  
   let messages
   try {
     messages = (await import(`@/messages/${locale}.json`)).default
@@ -30,7 +33,7 @@ export default async function AuthLayout({
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <h2 className="px-8 text-center text-3xl font-bold text-white">
-              {t("welcome")}
+                {t("welcome")}
               </h2>
             </div>
           </div>
