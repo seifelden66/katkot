@@ -6,8 +6,6 @@ import Image from 'next/image'
 import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-// import { useMutation, useQueryClient } from '@tanstack/react-query'
-// import { supabase } from '@/lib/supabaseClient'
 import { useAddComment } from '@/app/hooks/queries/usePostQueries';
 
 interface Profile {
@@ -47,6 +45,11 @@ interface Post {
   category?: Category;
 }
 
+interface Reaction {
+  type: string;
+  user_id: string;
+}
+
 interface PostCardProps {
   post: Post;
   comments?: Comment[];
@@ -54,6 +57,13 @@ interface PostCardProps {
 
 interface CommentItemProps {
   comment: Comment;
+}
+
+
+interface PostCardProps {
+  post: Post;
+  comments?: Comment[];
+  reactions?: Reaction[];
 }
 
 // interface AddCommentParams {
@@ -123,7 +133,8 @@ const CommentItem = ({ comment }: CommentItemProps) => (
   </div>
 );
 
-export default function PostCard({ post, comments = [] }: PostCardProps) {
+export default function PostCard({ post, comments = [],   reactions = []
+ }: PostCardProps) {
   const { session } = useSession()  
   const locale = useLocale();
   const userId = session?.user?.id
@@ -186,7 +197,7 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
           <p className="whitespace-pre-line">{post.content}</p>
           
           {post.store_name && (
-            <div className="mt-2 flex items-center text-sm text-blue-600 ">
+            <div className="mt-2 flex items-center text-sm text-blue-600">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
@@ -197,36 +208,21 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
           {post.media_url && (
             <div className="mt-3 rounded-lg overflow-hidden">
               <Link href={`/${locale}/posts/${post.id}`}>
-                {/* {post.media_url.includes('bing.com') ? (
-                  <img 
-                    src={post.media_url} 
-                    alt="Post media content"
-                    className="w-full h-auto object-cover max-h-[500px]"
-                  />
-                ) : (
-                  <Image
-                    src={post.media_url}
-                    width={800}
-                    height={600}
-                    alt="Post media content"
-                    className="w-full h-auto object-cover max-h-[500px]"
-                    unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
-                  />
-                )} */}
-                 <Image
-                    src={post.media_url}
-                    width={800}
-                    height={600}
-                    alt="Post media content"
-                    className="w-full h-auto object-cover max-h-[500px]"
-                    unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
-                  />
+                <Image
+                  src={post.media_url}
+                  width={800}
+                  height={600}
+                  alt="Post media content"
+                  className="w-full h-auto object-cover max-h-[500px]"
+                  unoptimized={post.media_url.startsWith('data:') || post.media_url.includes('blob:')}
+                />
               </Link>
             </div>
           )}
         </div>
 
-        <ReactionButtons postId={post.id} />
+        {/* Pass reactions as props instead of fetching individually */}
+        <ReactionButtons postId={post.id} reactions={reactions} />
         
         <div className="mt-4 pt-3">
           <h4 className="font-medium mb-3">
@@ -268,7 +264,7 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
                     type="text"
                     name="comment"
                     placeholder="Add a comment..."
-                    className="w-full py-2 px-4 bg-gray-100  rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 "
+                    className="w-full py-2 px-4 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                   <button
                     type="submit"
@@ -286,7 +282,7 @@ export default function PostCard({ post, comments = [] }: PostCardProps) {
             <div className="mt-3 pt-2 text-center">
               <Link
                 href={`/${locale}/auth/login`}
-                className="text-purple-500 hover:text-purple-600  font-medium"
+                className="text-purple-500 hover:text-purple-600 font-medium"
               >
                 Sign in to comment
               </Link>

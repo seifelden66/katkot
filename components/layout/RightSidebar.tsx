@@ -51,13 +51,12 @@ export default function RightSidebar() {
   const searchRef = useRef<HTMLDivElement>(null)
 
   const { data: usersToFollow = [] } = useUsersToFollow(currentUserId)
-  // Update the type annotation for searchResults
+
   const { data: searchResults, isLoading: isSearching } = useSearch(debouncedQuery) as { 
     data: SearchResults | undefined; 
     isLoading: boolean 
   };
 
-  // Debounce input
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(searchQuery), 500)
     return () => clearTimeout(timer)

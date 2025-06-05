@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
+import { createNotification } from '@/lib/notifications';
 const isClient = typeof window !== 'undefined';
 
 import { Post } from '@/types/post';
@@ -482,6 +483,24 @@ export function usePostReactions(postId: string | undefined) {
   });
 }
 
+export function usePostReactionsBulk(postIds: (string | number)[]) {
+  return useQuery({
+    queryKey: ['allReactions', postIds.join(',')],
+    queryFn: async () => {
+      if (!postIds.length) return {};
+      const { data, error } = await supabase
+        .from('reactions')
+        .select('post_id, type, user_id')
+        .in('post_id', postIds);
+      if (error) throw error;
+      return (data || []).reduce((acc, reaction) => {
+        acc[reaction.post_id] = (acc[reaction.post_id] || []).concat(reaction);
+        return acc;
+      }, {} as Record<string, { type: string; user_id: string }[]>);
+    },
+    enabled: postIds.length > 0 && isClient,
+  });
+}
 export function useToggleReaction() {
   const queryClient = useQueryClient();
   
@@ -498,6 +517,13 @@ export function useToggleReaction() {
       }
       
       if (previousReaction !== type) {
+        // Get post author to send notification
+        const { data: postData } = await supabase
+          .from('posts')
+          .select('user_id')
+          .eq('id', postId)
+          .single();
+        
         const { error } = await supabase
           .from('reactions')
           .insert({
@@ -507,6 +533,17 @@ export function useToggleReaction() {
           });
           
         if (error) throw error;
+        
+        // Create notification for post author if it's not the same user
+        if (postData && postData.user_id !== userId) {
+          await createNotification({
+            userId: postData.user_id,
+            actorId: userId,
+            type: 'like',
+            postId
+          });
+        }
+        
         return type;
       }
       
