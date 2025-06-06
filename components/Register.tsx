@@ -69,6 +69,7 @@ const selectedRegionId = 1
               type="text"
               placeholder={t('fullName')}
               value={fullName}
+              className="w-full pl-10 pr-4 py-3 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]"
               onChange={(e) => setFullName(e.target.value)}
               required
             />
@@ -78,6 +79,7 @@ const selectedRegionId = 1
               type="email"
               placeholder={t('email')}
               value={email}
+              className="w-full pl-10 pr-4 py-3 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]"
               onChange={(e) => setEmail(e.target.value)}
               required
             />

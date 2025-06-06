@@ -81,14 +81,14 @@ export default function LeftSidebar({
 
   return (
     <aside
-      className={`fixed lg:sticky top-0 h-screen lg:flex flex-col w-72 border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'} z-30 transform transition-transform duration-300 ease-in-out overflow-y-auto
+      className={`fixed lg:sticky top-0 h-screen lg:flex flex-col w-72 border-r border-[hsl(var(--border))] z-30 transform transition-transform duration-300 ease-in-out overflow-y-auto
       ${isRTL 
         ? (isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0') 
         : (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')}
       ${isRTL ? 'right-0 lg:right-auto' : 'left-0 lg:left-auto'}`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className={`flex flex-col h-full pt-20 lg:p-6 ${darkMode ? 'bg-gray-900 lg:bg-inherit' : 'bg-gray-200 lg:bg-inherit'}`}>
+      <div className="flex flex-col h-full pt-20 lg:p-6 bg-[hsl(var(--background))]">
         <div className="hidden lg:flex items-center gap-2 mb-10">
           <span className="text-2xl font-extrabold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">Katkot</span>
         </div>
@@ -106,11 +106,11 @@ export default function LeftSidebar({
                 className={
                   isCreatePost 
                     ? "flex items-center px-5 py-3 mt-6 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md"
-                    : `flex items-center px-5 py-3 ${darkMode ? 'text-gray-200' : 'text-gray-700'} rounded-full ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-purple-50'} transition-colors`
+                    : `flex items-center px-5 py-3 text-[hsl(var(--foreground))] rounded-full hover:bg-[hsl(var(--secondary))] transition-colors`
                 }
               >
                 
-                <div className={`${isCreatePost ? '' : `${darkMode ? 'bg-gray-800' : 'bg-purple-100'} p-2 rounded-full relative`} ${isRTL ? 'ml-3' : 'mr-3'}`}>
+                <div className={`${isCreatePost ? '' : `bg-[hsl(var(--muted))] p-2 rounded-full relative`} ${isRTL ? 'ml-3' : 'mr-3'}`}>
                   {link.icon}
                   {isNotifications && <NotificationBadge />}
                 </div>
@@ -122,14 +122,14 @@ export default function LeftSidebar({
           })}
         </nav>
 
-        <div className="mt-auto pt-6 border-t border-gray-200 ">
-          <div className={`rounded-2xl p-4 shadow-sm`}>
+        <div className="mt-auto pt-6 border-t border-[hsl(var(--border))]">
+          <div className="rounded-2xl p-4 shadow-sm bg-[hsl(var(--card))]">
             <UserGreeting />
 
             <div className="flex items-center mt-4 justify-between">
               <button
                 onClick={() => setDarkMode(!darkMode)}
-                className={`flex items-center px-4 py-2 text-sm ${darkMode ? 'text-gray-200 bg-gray-700 hover:bg-gray-600' : 'text-gray-700 bg-white hover:bg-gray-100'} rounded-full transition-colors shadow-sm`}
+                className={`flex items-center px-4 py-2 text-sm text-[hsl(var(--foreground))] bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--accent))] rounded-full transition-colors shadow-sm`}
               >
                 {darkMode ? (
                   <>

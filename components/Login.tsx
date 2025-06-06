@@ -64,6 +64,7 @@ export default function Login() {
                             type="email"
                             placeholder={t('email')}
                             value={email}
+                            className="w-full pl-10 pr-4 py-3 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]"
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
@@ -74,6 +75,7 @@ export default function Login() {
                             placeholder={t('password')}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]"
                             required
                         />
                     </div>

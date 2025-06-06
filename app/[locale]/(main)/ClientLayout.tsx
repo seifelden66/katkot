@@ -29,7 +29,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-  }, []);
+  }, [darkMode]);
 
   useEffect(() => {
     if (isRTL) {
@@ -94,8 +94,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     </div>
 
                     <main className={`flex-1 w-full max-w-full lg:max-w-3xl mx-auto min-h-screen order-2 lg:order-2`}>
-                      <div className="sticky top-14 lg:top-0 z-20 backdrop-blur-md px-4 py-4">
-                        <h1 className="text-xl font-bold text-gray-900">home</h1>
+                      <div className="sticky top-14 lg:top-0 z-20 backdrop-blur-md px-4 py-4 bg-[hsl(var(--background))]">
+                        <h1 className="text-xl font-bold text-[hsl(var(--foreground))]">home</h1>
                       </div>
                       <div className="p-4">{children}</div>
                     </main>

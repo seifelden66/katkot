@@ -7,6 +7,7 @@ import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { useAddComment } from '@/app/hooks/queries/usePostQueries';
+import { CommentIcon } from './icons/Icons'
 
 interface Profile {
   avatar_url?: string;
@@ -66,12 +67,6 @@ interface PostCardProps {
   reactions?: Reaction[];
 }
 
-// interface AddCommentParams {
-//   postId: string;
-//   userId: string;
-//   content: string;
-// }
-
 export const ShimmerEffect = () => (
   <div className="animate-pulse rounded-xl shadow-sm border border-gray-200  overflow-hidden p-4 mb-4">
     <div className="flex items-center gap-3 mb-4">
@@ -106,19 +101,18 @@ export const ShimmerEffect = () => (
 );
 
 const CommentItem = ({ comment }: CommentItemProps) => (
-  
   <div className="flex items-start gap-3 p-3 border-b border-gray-100  hover:bg-gray-50 transition-colors">
-    {comment.profiles?.avatar_url ? (
+    {comment.author?.avatar_url ? (
       <Image
-        src={comment.profiles.avatar_url}
-        alt={`${comment.profiles.full_name}'s avatar`}
+        src={comment.author.avatar_url}
+        alt={`${comment.author.full_name}'s avatar`}
         width={36}
         height={36}
         className="w-9 h-9 rounded-full object-cover"
       />
     ) : (
       <div className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-        {comment.profiles?.full_name?.charAt(0) || '?'}
+        {comment.author?.full_name?.charAt(0) || '?'}
       </div>
     )}
     <div className="flex-1">
@@ -264,16 +258,14 @@ export default function PostCard({ post, comments = [],   reactions = []
                     type="text"
                     name="comment"
                     placeholder="Add a comment..."
-                    className="w-full py-2 px-4 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
+                    className="w-full py-2 px-4 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]"
+                    />
                   <button
                     type="submit"
                     disabled={isCommenting}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-purple-500 hover:bg-purple-600 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
+                   <CommentIcon />
                   </button>
                 </div>
               </div>

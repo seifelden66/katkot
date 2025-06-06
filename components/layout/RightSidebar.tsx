@@ -111,10 +111,10 @@ export default function RightSidebar() {
   }
 
   return (
-    <aside className="hidden xl:block p-6 sticky top-0 h-screen overflow-y-auto">
+    <aside className="hidden xl:block p-6 sticky top-0 h-screen overflow-y-auto bg-[hsl(var(--background))]">
       <div className="mb-8" ref={searchRef}>
         <form onSubmit={handleSearchSubmit} className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[hsl(var(--muted-foreground))]">
             <SearchIcon />
           </div>
           <input
@@ -123,21 +123,21 @@ export default function RightSidebar() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             onFocus={handleSearchFocus}
-            className="w-full pl-10 pr-4 py-3 border-none rounded-full bg-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+            className="w-full pl-10 pr-4 py-3 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]"
           />
         </form>
 
         {showResults && debouncedQuery.trim().length >= 2 && (
-          <div className="absolute mt-2 w-full max-w-md bg-white rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+          <div className="absolute mt-2 w-full max-w-md bg-[hsl(var(--card))] rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
             {isSearching ? (
-              <div className="p-4 text-center text-gray-500">{t('loading')}</div>
+              <div className="p-4 text-center text-[hsl(var(--muted-foreground))]">{t('loading')}</div>
             ) : searchResults && (
               searchResults.users.length > 0 || searchResults.posts.length > 0
             ) ? (
               <>
                 {searchResults.users.length > 0 && (
                   <div className="p-2">
-                    <h3 className="text-sm font-semibold text-gray-500 px-3 py-1">
+                    <h3 className="text-sm font-semibold text-[hsl(var(--muted-foreground))] px-3 py-1">
                       {t('users')}
                     </h3>
                     {searchResults.users.slice(0, 3).map(user => (
@@ -145,7 +145,7 @@ export default function RightSidebar() {
                         key={user.id}
                         href={`/${locale}/profile/${user.id}`}
                         onClick={() => setShowResults(false)}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg"
+                        className="flex items-center gap-3 p-3 hover:bg-[hsl(var(--muted))] rounded-lg"
                       >
                         <div className="w-10 h-10 rounded-full overflow-hidden">
                           {user.avatar_url ? (
@@ -163,8 +163,8 @@ export default function RightSidebar() {
                           )}
                         </div>
                         <div>
-                          <p className="font-medium">{user.full_name}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-[hsl(var(--foreground))]">{user.full_name}</p>
+                          <p className="text-sm text-[hsl(var(--muted-foreground))]">
                             @{user.id.slice(0, 8)}
                           </p>
                         </div>
@@ -222,8 +222,8 @@ export default function RightSidebar() {
                 )}
               </>
             ) : (
-              <div className="p-4 text-center text-gray-500">
-                {t('noResults')} “{debouncedQuery}”
+              <div className="p-4 text-center text-[hsl(var(--muted-foreground))]">
+                {t('noResults')} &ldquo;{debouncedQuery}&rdquo;
               </div>
             )}
           </div>
@@ -231,17 +231,17 @@ export default function RightSidebar() {
       </div>
 
       <div className="mb-8">
-        <h3 className="text-lg font-semibold mb-4">{t('filterByCategory')}</h3>
+        <h3 className="text-lg font-semibold mb-4 text-[hsl(var(--foreground))]">{t('filterByCategory')}</h3>
         <CategoryFilter />
       </div>
       <div className="mb-8">
-        <h3 className="text-lg font-semibold mb-4">{t('filterByStore')}</h3>
+        <h3 className="text-lg font-semibold mb-4 text-[hsl(var(--foreground))]">{t('filterByStore')}</h3>
         <StoreFilter />
       </div>
 
       
-      <div className="rounded-2xl p-5 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">{t('whoToFollow')}</h3>
+      <div className="rounded-2xl p-5 shadow-sm bg-[hsl(var(--card))] border border-[hsl(var(--border))]">
+        <h3 className="text-lg font-semibold mb-4 text-[hsl(var(--foreground))]">{t('whoToFollow')}</h3>
         <div className="space-y-5">
           {usersToFollow.map(user => (
             <div key={user.id} className="flex items-center justify-between">
@@ -262,22 +262,22 @@ export default function RightSidebar() {
                   )}
                 </div>
                 <div>
-                  <p className="font-medium">{user.full_name}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium text-[hsl(var(--foreground))]">{user.full_name}</p>
+                  <p className="text-sm text-[hsl(var(--muted-foreground))]">
                     @{user.id.slice(0, 8)}
                   </p>
                 </div>
               </Link>
               <button
                 onClick={() => handleFollow(user.id)}
-                className="px-4 py-2 text-sm bg-purple-100 text-purple-600 rounded-full font-medium hover:bg-purple-200 transition-colors"
+                className="px-4 py-2 text-sm bg-[hsl(var(--primary))] bg-opacity-10 text-[hsl(var(--primary))] rounded-full font-medium hover:bg-opacity-20 transition-colors"
               >
                 {t('follow')}
               </button>
             </div>
           ))}
           {usersToFollow.length === 0 && (
-            <div className="text-center text-gray-500 py-4">
+            <div className="text-center text-[hsl(var(--muted-foreground))] py-4">
               {currentUserId ? t('noSuggestions') : t('signInToSee')}
             </div>
           )}

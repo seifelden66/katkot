@@ -78,7 +78,7 @@ export default function ReactionButtons({ postId, reactions: initialReactions = 
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
           userReaction === 'like'
             ? 'bg-green-100 text-green-600'
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+            : 'bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] text-[hsl(var(--foreground))]'
         }`}
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -92,7 +92,7 @@ export default function ReactionButtons({ postId, reactions: initialReactions = 
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
           userReaction === 'dislike'
             ? 'bg-red-100 text-red-600'
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+            : 'bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] text-[hsl(var(--foreground))]'
         }`}
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

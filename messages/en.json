@@ -26,7 +26,7 @@
         },
         "search": {
             "title": "Search",
-            "placeholder": "Search Katkot",
+            "placeholder": "Search",
             "noResults": "No results found for",
             "allResults": "All Results",
             "users": "Users",
