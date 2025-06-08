@@ -3,7 +3,14 @@ import { useParams, useRouter } from 'next/navigation'
 import PostCard from '@/components/PostCard'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocale } from 'next-intl'
-import { usePost, useStore, useNextPostId, usePrevPostId } from '@/app/hooks/queries/usePostQueries'
+import { 
+  usePost, 
+  useStore, 
+  useNextPostId, 
+  usePrevPostId,
+  usePostComments,
+  usePostReactionsBulk
+} from '@/app/hooks/queries/usePostQueries'
 import { useIsMounted } from '@/hooks/useIsMounted'
 
 const PostSkeleton = () => (
@@ -68,6 +75,9 @@ export default function PostPage() {
     data: prevPostId,
     error: prevPostError
   } = usePrevPostId(postId)
+
+  const { data: commentsData = {} } = usePostComments(postId ? [postId] : [])
+  const { data: reactionsData = {} } = usePostReactionsBulk(postId ? [postId] : [])
 
   useEffect(() => {
     if (!postId) {
@@ -145,7 +155,12 @@ export default function PostPage() {
         </button>
       </div>
 
-      <PostCard post={{...post, category_id: post.category_id?.toString()}}  />
+      {/* Updated PostCard with comments and reactions */}
+      <PostCard 
+        post={{...post, category_id: post.category_id?.toString()}}
+        comments={commentsData[postId] || []}
+        reactions={reactionsData[postId] || []}
+      />
 
       {store && (
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
@@ -204,7 +219,7 @@ export default function PostPage() {
             }`}
         >
           Next Post
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.html/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
           </svg>
         </button>

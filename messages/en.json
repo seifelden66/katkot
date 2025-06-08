@@ -9,6 +9,7 @@
         "nav": {
             "home": "Home",
             "explore": "Explore",
+            "documentation": "How to Use",
             "notifications": "Notifications",
             "profile": "Profile",
             "create_post": "Create Post"
@@ -81,5 +82,59 @@
         "clearAll": "Clear All",
         "noNotifications": "You have no notifications",
         "delete": "Delete notification"
+    },
+    "postCard": {
+        "comments": "Comments",
+        "addComment": "Add a comment...",
+        "signInToComment": "Sign in to comment",
+        "postMedia": "Post media content"
+    },
+    "documentation": {
+        "title": "How to Use Katkot",
+        "subtitle": "Learn how to use Katkot and earn points",
+        "gettingStarted": {
+            "title": "Getting Started",
+            "description": "Welcome to Katkot! Here's how to get started and make the most of our platform."
+        },
+        "steps": {
+            "createAccount": {
+                "title": "Create an Account",
+                "description": "Sign up for a free account to start posting, commenting, and earning points."
+            },
+            "createPosts": {
+                "title": "Create Posts",
+                "description": "Share products you love with the community. Add images and detailed descriptions."
+            }
+        },
+        "earningPoints": {
+            "title": "Points System",
+            "description": "Understand how the points system works in the Katkot community:",
+            "methods": {
+                "posting": {
+                    "title": "Creating Posts",
+                    "description": "Creating posts requires points from your balance.",
+                    "points": "-20 points per regular post, -50 points for group posts"
+                },
+                "commenting": {
+                    "title": "Commenting",
+                    "description": "Engage with other users by commenting on their posts.",
+                    "points": "No points required or earned"
+                },
+                "reactions": {
+                    "title": "Reactions",
+                    "description": "React to posts with likes, loves, or other reactions.",
+                    "points": "No points required or earned"
+                }
+            }
+        },
+        "tips": {
+            "title": "Tips for Success",
+            "list": {
+                "regular": "Be active regularly to earn more points.",
+                "quality": "Focus on quality content to get more engagement.",
+                "engage": "Engage with other users' content to build your network.",
+                "complete": "Complete your profile to increase visibility."
+            }
+        }
     }
 }

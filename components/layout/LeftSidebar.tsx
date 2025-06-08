@@ -37,8 +37,8 @@ const navLinks: NavLink[] = [
     icon: <HomeIcon />
   },
   {
-    name: 'Explore',
-    href: '/search',
+    name: 'Documentation',
+    href: '/documentation',
     icon: <ExploreIcon />
   },
   {

@@ -1,9 +1,9 @@
 {
   "hello": "مرحبا",
-  "NotFound":{
-      "title": "الصفحة غير موجودة",
-      "description": "الصفحة التي تبحث عنها غير موجودة.",
-      "goHome": "العودة إلى الصفحة الرئيسية" 
+  "NotFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "الصفحة التي تبحث عنها غير موجودة.",
+    "goHome": "العودة إلى الصفحة الرئيسية"
   },
   "search": {
     "title": "بحث",
@@ -17,6 +17,7 @@
     "nav": {
       "home": "الرئيسية",
       "explore": "استكشاف",
+      "documentation": "كيفية الاستخدام",
       "notifications": "الإشعارات",
       "profile": "الملف الشخصي",
       "create_post": "إنشاء منشور"
@@ -25,9 +26,26 @@
       "light": "فاتح",
       "dark": "داكن"
     },
-   
     "search": {
-      "placeholder": "ابحث في كتكوت"
+      "title": "بحث",
+      "placeholder": "",
+      "noResults": "لا توجد نتائج",
+      "allResults": "جميع النتائج",
+      "users": "المستخدمون",
+      "posts": "المنشورات",
+      "filterByCategory": "التصفية حسب الفئة",
+      "filterByStore": "التصفية حسب المتجر",
+      "trendingTopics": "المواضيع الرائجة",
+      "viewAll": "عرض الكل",
+      "loading": "جارِ التحميل",
+      "whoToFollow": "من يجب متابعته",
+      "follow": "متابعة",
+      "noSuggestions": "لا توجد اقتراحات متاحة",
+      "signInToSee": "سجّل الدخول لرؤية الاقتراحات",
+      "trendingTopic": "موضوع شائع {{number}}",
+      "mustBeLoggedIn": "يجب أن تكون مسجّل الدخول لمتابعة المستخدمين",
+      "followSuccess": "تمت متابعة المستخدم بنجاح",
+      "followError": "خطأ أثناء متابعة المستخدم: "
     },
     "filters": {
       "category": "تصفية حسب الفئة",
@@ -48,28 +66,66 @@
       "title": "اقتراحات للمتابعة",
       "username": "اسم المستخدم",
       "button": "متابعة"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "clearAll": "حذف الكل",
+      "noNotifications": "ليس لديك إشعارات",
+      "delete": "حذف الإشعار"
     }
   },
-  "auth": {
-    "region":"المنطقة",
-    "email": "الايميل",
-    "password": "الرقم العام",
-    "fullName": "الاسم كامل",
-    "signIn": "تسجيل الدخول",
-    "signOut": "تسجيل خروج",
-    "signUp": "إنشاء حساب",
-    "loading": "جاري التحميل",
-    "createAccount": "إنشاء حساب جديد",
-    "orContinueWith": "أو قم بالتسجيل باستخدام",
-    "dontHaveAccount": "لا يوجد لديك حساب؟",
-    "alreadyHaveAccount": "هل لديك حساب؟",
-    "google": "جوجل",
-    "welcome":"مرحبا بك قي قطقوط"
+  "postCard": {
+    "comments": "التعليقات",
+    "addComment": "اضف تعليق...",
+    "signInToComment": "Sign in to comment",
+    "postMedia": "Post media content"
   },
-  "notifications": {
-    "title": "الإشعارات",
-    "clearAll": "حذف الكل",
-    "noNotifications": "ليس لديك إشعارات",
-    "delete": "حذف الإشعار"
+  "documentation": {
+    "title": "كيفية استخدام كتكوت",
+    "subtitle": "تعلم كيفية استخدام كتكوت وكسب النقاط",
+    "gettingStarted": {
+      "title": "البدء",
+      "description": "مرحبًا بك في كتكوت! إليك كيفية البدء والاستفادة القصوى من منصتنا."
+    },
+    "steps": {
+      "createAccount": {
+        "title": "إنشاء حساب",
+        "description": "قم بالتسجيل للحصول على حساب مجاني للبدء في النشر والتعليق وكسب النقاط."
+      },
+      "createPosts": {
+        "title": "إنشاء منشورات",
+        "description": "شارك المنتجات التي تحبها مع المجتمع. أضف الصور والأوصاف التفصيلية."
+      }
+    },
+    "earningPoints": {
+      "title": "نظام النقاط",
+      "description": "افهم كيف يعمل نظام النقاط في مجتمع كتكوت:",
+      "methods": {
+        "posting": {
+          "title": "إنشاء المنشورات",
+          "description": "إنشاء المنشورات يتطلب نقاطًا من رصيدك.",
+          "points": "-20 نقطة لكل منشور عادي، -50 نقطة للمنشورات الجماعية"
+        },
+        "commenting": {
+          "title": "التعليق",
+          "description": "تفاعل مع المستخدمين الآخرين من خلال التعليق على منشوراتهم.",
+          "points": "لا تتطلب أو تكسب نقاط"
+        },
+        "reactions": {
+          "title": "التفاعلات",
+          "description": "تفاعل مع المنشورات بالإعجابات أو الحب أو التفاعلات الأخرى.",
+          "points": "لا تتطلب أو تكسب نقاط"
+        }
+      }
+    },
+    "tips": {
+      "title": "نصائح للنجاح",
+      "list": {
+        "regular": "كن نشطًا بانتظام لكسب المزيد من النقاط.",
+        "quality": "ركز على المحتوى عالي الجودة للحصول على المزيد من التفاعل.",
+        "engage": "تفاعل مع محتوى المستخدمين الآخرين لبناء شبكتك.",
+        "complete": "أكمل ملفك الشخصي لزيادة الظهور."
+      }
+    }
   }
 }

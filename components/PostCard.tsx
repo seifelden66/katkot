@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import ReactionButtons from './ReactionButtons'
 import { useSession } from '@/contexts/SessionContext'
 import Image from 'next/image'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { useAddComment } from '@/app/hooks/queries/usePostQueries';
@@ -127,10 +127,11 @@ const CommentItem = ({ comment }: CommentItemProps) => (
   </div>
 );
 
-export default function PostCard({ post, comments = [],   reactions = []
- }: PostCardProps) {
+export default function PostCard({ post, comments = [], reactions = [] }: PostCardProps) {
+  console.log(post)
   const { session } = useSession()  
   const locale = useLocale();
+  const t = useTranslations('postCard');
   const userId = session?.user?.id
   
   const { mutate: addComment, isPending: isCommenting } = useAddComment();
@@ -138,7 +139,7 @@ export default function PostCard({ post, comments = [],   reactions = []
   const handleComment = useCallback((e: React.FormEvent, content: string) => {
     e.preventDefault()
     if (!content.trim() || !userId || !post?.id) return
-    
+  
     addComment({
       postId: post.id,
       userId,
@@ -200,7 +201,7 @@ export default function PostCard({ post, comments = [],   reactions = []
           )}
           
           {post.media_url && (
-            <div className="mt-3 rounded-lg overflow-hidden">
+            <div className="mt-3 rounded-lg overflow-hidden cursor-pointer">
               <Link href={`/${locale}/posts/${post.id}`}>
                 <Image
                   src={post.media_url}
@@ -215,12 +216,11 @@ export default function PostCard({ post, comments = [],   reactions = []
           )}
         </div>
 
-        {/* Pass reactions as props instead of fetching individually */}
         <ReactionButtons postId={post.id} reactions={reactions} />
         
         <div className="mt-4 pt-3">
           <h4 className="font-medium mb-3">
-            Comments ({comments.length})
+            {t('comments')} ({comments.length})
           </h4>
           
           <div className="space-y-1">
@@ -257,9 +257,9 @@ export default function PostCard({ post, comments = [],   reactions = []
                   <input
                     type="text"
                     name="comment"
-                    placeholder="Add a comment..."
-                    className="w-full py-2 px-4 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]"
-                    />
+                    placeholder={t('addComment')}
+                    className="w-full py-2 px-4 border-none rounded-full bg-[hsl(var(--muted))] placeholder-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] transition-all text-[hsl(var(--foreground))]" 
+                  />
                   <button
                     type="submit"
                     disabled={isCommenting}
@@ -276,7 +276,7 @@ export default function PostCard({ post, comments = [],   reactions = []
                 href={`/${locale}/auth/login`}
                 className="text-purple-500 hover:text-purple-600 font-medium"
               >
-                Sign in to comment
+                {t('signInToComment')}
               </Link>
             </div>
           )}

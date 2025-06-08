@@ -75,7 +75,7 @@ export default function ReactionButtons({ postId, reactions: initialReactions = 
     <div className="flex items-center gap-4">
       <button
         onClick={() => handleReaction('like')}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
+        className={`flex items-center gap-2 px-3 py-1.5 cursor-pointer rounded-full transition-colors ${
           userReaction === 'like'
             ? 'bg-green-100 text-green-600'
             : 'bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] text-[hsl(var(--foreground))]'
@@ -89,7 +89,7 @@ export default function ReactionButtons({ postId, reactions: initialReactions = 
       
       <button
         onClick={() => handleReaction('dislike')}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
+        className={`flex items-center gap-2 px-3 py-1.5 cursor-pointer rounded-full transition-colors ${
           userReaction === 'dislike'
             ? 'bg-red-100 text-red-600'
             : 'bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] text-[hsl(var(--foreground))]'

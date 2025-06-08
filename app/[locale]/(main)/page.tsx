@@ -1,14 +1,12 @@
 'use client'
 import { useSession } from '@/contexts/SessionContext'
 import { 
-  useCategories, 
-  useStores, 
-  useUserProfile, 
+    useUserProfile, 
   usePosts, 
   usePostComments,
   usePostReactionsBulk 
 } from '@/app/hooks/queries/usePostQueries'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { RootState, setSelectedCategory, setSelectedStore } from '@/lib/store'
 import PostCard from '@/components/PostCard'
 import { useIsMounted } from '@/hooks/useIsMounted'
@@ -17,13 +15,8 @@ export default function HomePage() {
   const hasMounted = useIsMounted()
 
   const selectedCategory = useSelector((state: RootState) => state.filter.selectedCategory)
-  const selectedStore = useSelector((state: RootState) => state.filter.selectedStore)
-  const dispatch = useDispatch()
-  
+  const selectedStore = useSelector((state: RootState) => state.filter.selectedStore)  
   const { session } = useSession()
-
-  const { data: categories = [] } = useCategories()
-  const { data: stores = [] } = useStores()
   const { data: userProfile } = useUserProfile(session?.user?.id)
 
   const { data: posts = [], isLoading } = usePosts({
@@ -34,7 +27,6 @@ export default function HomePage() {
   })
 
   const { data: commentsData = {} } = usePostComments(posts.map(p => p.id))
-  // Add bulk reactions fetching
   const { data: reactionsData = {} } = usePostReactionsBulk(posts.map(p => p.id))
 
   if (!hasMounted) {
@@ -61,7 +53,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2 mb-4">
+      {/* <div className="flex flex-wrap gap-2 mb-4">
         <button onClick={() => dispatch(setSelectedCategory(null))} className={`px-3 py-1 rounded-full text-sm ${selectedCategory === null ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>All Categories</button>
         {categories.map(cat => (
           <button key={cat.id} onClick={() => dispatch(setSelectedCategory(selectedCategory === cat.id ? null : cat.id))} className={`px-3 py-1 rounded-full text-sm ${selectedCategory === cat.id ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>{cat.name}</button>
@@ -72,12 +64,12 @@ export default function HomePage() {
         {stores.map(store => (
           <button key={store.id} onClick={() => dispatch(setSelectedStore(selectedStore === store.id ? null : store.id))} className={`px-3 py-1 rounded-full text-sm ${selectedStore === store.id ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>{store.name}</button>
         ))}
-      </div>
+      </div> */}
 
       {posts.length > 0 ? (
         <div className="space-y-6">
           {posts.map(post => (
-            <div key={post.id} className="cursor-pointer transition-transform hover:scale-[1.01] focus:outline-none">
+            <div key={post.id} className="transition-transform hover:scale-[1.01] focus:outline-none">
               {post.region?.code !== 'global' && <div className="mb-1 text-xs text-right"><span className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full">{post.region.name}</span></div>}
               <PostCard 
                 post={post} 

@@ -127,6 +127,7 @@ export function useAddComment() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['comments', variables.postId] });
+      queryClient.invalidateQueries({ queryKey: ['allComments'] });
     }
   });
 }

@@ -24,9 +24,9 @@ export default function MobileNavigation() {
           <span className="text-xs mt-1">{t('home')}</span>
         </Link>
 
-        <Link href={`/${locale}/search`} className="flex flex-col items-center justify-center text-[hsl(var(--muted-foreground))]">
+        <Link href={`/${locale}/documentation`} className="flex flex-col items-center justify-center text-[hsl(var(--muted-foreground))]">
           <ExploreIcon />
-          <span className="text-xs mt-1">{t('explore')}</span>
+          <span className="text-xs mt-1">{t('documentation')}</span>
         </Link>
         {session && (
           <Link href={`/${locale}/posts/create`} className="flex flex-col items-center justify-center -mt-6">
