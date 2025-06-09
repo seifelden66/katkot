@@ -74,6 +74,28 @@
       "delete": "حذف الإشعار"
     }
   },
+  "auth": {
+    "region": "المنطقة",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "signOut": "تسجيل الخروج",
+    "loading": "جاري التحميل",
+    "createAccount": "إنشاء حساب",
+    "orContinueWith": "أو المتابعة عبر",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "google": "جوجل",
+    "welcome": "مرحبًا بك في كتكوت"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "clearAll": "مسح الكل",
+    "noNotifications": "ليس لديك أي إشعارات",
+    "delete": "حذف الإشعار"
+  },
   "postCard": {
     "comments": "التعليقات",
     "addComment": "اضف تعليق...",
