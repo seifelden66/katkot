@@ -52,7 +52,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       if (
         isMobileMenuOpen &&
         sidebarRef.current &&
-        !sidebarRef.current.contains(event.target as Node)
+        !sidebarRef.current.contains(event.target as Node) &&
+        !(event.target as Element).closest('button')
       ) {
         setIsMobileMenuOpen(false);
       }

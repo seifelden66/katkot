@@ -208,7 +208,6 @@ export default function RightSidebar() {
                     ))}
                   </div>
                 )}
-
                 {(searchResults.users.length > 3 || searchResults.posts.length > 3) && (
                   <div className="p-3 text-center border-t">
                     <Link

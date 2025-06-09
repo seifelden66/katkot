@@ -42,8 +42,13 @@ export default function Login() {
     }
 
     const handleGoogleLogin = async () => {
-        const redirectTo = 
-          `${window.location.origin}/${locale}/auth/callback`
+        // Get the current origin, but ensure it's your production domain in production
+        const baseUrl = process.env.NODE_ENV === 'production' 
+            ? process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+            : window.location.origin;
+            
+        const redirectTo = `${baseUrl}/${locale}/auth/callback`
+        
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: { redirectTo }

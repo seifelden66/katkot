@@ -128,7 +128,6 @@ const CommentItem = ({ comment }: CommentItemProps) => (
 );
 
 export default function PostCard({ post, comments = [], reactions = [] }: PostCardProps) {
-  console.log(post)
   const { session } = useSession()  
   const locale = useLocale();
   const t = useTranslations('postCard');

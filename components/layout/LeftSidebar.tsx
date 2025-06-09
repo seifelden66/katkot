@@ -81,14 +81,14 @@ export default function LeftSidebar({
 
   return (
     <aside
-      className={`fixed lg:sticky top-0 h-screen lg:flex flex-col w-72 border-r border-[hsl(var(--border))] z-30 transform transition-transform duration-300 ease-in-out overflow-y-auto
+      className={`fixed lg:sticky top-0 h-screen lg:flex flex-col w-72 border-r border-[hsl(var(--border))] z-30 transform transition-transform duration-300 ease-in-out bg-[hsl(var(--background))] flex flex-col
       ${isRTL 
         ? (isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0') 
         : (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')}
       ${isRTL ? 'right-0 lg:right-auto' : 'left-0 lg:left-auto'}`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="flex flex-col h-full pt-20 lg:p-6 bg-[hsl(var(--background))]">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-transparent pt-20 lg:p-6">
         <div className="hidden lg:flex items-center gap-2 mb-10">
           <span className="text-2xl font-extrabold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">Katkot</span>
         </div>
