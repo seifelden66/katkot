@@ -269,9 +269,9 @@ export default function RightSidebar() {
               </Link>
               <button
                 onClick={() => handleFollow(user.id)}
-                className="px-4 py-2 text-sm bg-[hsl(var(--primary))] bg-opacity-10 text-[hsl(var(--primary))] rounded-full font-medium hover:bg-opacity-20 transition-colors"
+                className="px-4 py-2 text-sm bg-[hsl(var(--primary))] bg-opacity-10 rounded-full font-medium hover:bg-opacity-20 transition-colors"
               >
-  {t('follow') || 'Follow'}
+  {t('follow')}
   </button>
             </div>
           ))}

@@ -20,28 +20,15 @@ export default function Login() {
     const isRTL = locale === 'ar';
 
     useEffect(() => {
-        const urlMessage = searchParams.get('message')
         const urlError = searchParams.get('error')
 
-        if (urlMessage) {
-            setMessage(getMessageText(urlMessage))
-        }
-
+    
         if (urlError) {
             setError(getErrorText(urlError))
         }
     }, [searchParams])
 
-    const getMessageText = (messageType: string) => {
-        switch (messageType) {
-            case 'registration_success':
-                return t('registrationSuccess') || 'Account created successfully! Please sign in.'
-            case 'check_email':
-                return t('checkEmailConfirmation') || 'Please check your email to confirm your account.'
-            default:
-                return messageType
-        }
-    }
+  
 
     const getErrorText = (errorType: string) => {
         switch (errorType) {

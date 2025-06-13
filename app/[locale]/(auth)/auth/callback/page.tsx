@@ -39,9 +39,9 @@ export default function AuthCallback() {
             secure: true,
             sameSite: 'Lax'
           })
-          
-          const isRegistrationIntent = sessionStorage.getItem('registration_intent')
+          const isRegistrationIntent = localStorage.getItem('registration_intent')
           const selectedRegionId = sessionStorage.getItem('selected_region_id')
+          localStorage.setItem('registration_intent', 'true')
           
           if (isRegistrationIntent === 'true') {
             console.log('Handling registration flow for new user')
