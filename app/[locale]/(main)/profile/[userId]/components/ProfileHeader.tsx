@@ -42,23 +42,6 @@ export default function ProfileHeader({
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-6">
                     <div>
                         {profile.avatar_url ? (
-                            // profile.avatar_url.includes('bing.com') ? (
-                            //     <img
-                            //         src={profile.avatar_url}
-                            //         alt="Profile picture"
-                            //         width={96}
-                            //         height={96}
-                            //         className="w-24 h-24 rounded-full object-cover border-2 border-white shadow-sm"
-                            //     />
-                            // ) : (
-                            //     <Image
-                            //         src={profile.avatar_url}
-                            //         alt="dsa"
-                            //         width={96}
-                            //         height={96}
-                            //         className="w-24 h-24 rounded-full object-cover border-2 border-white shadow-sm"
-                            //     />
-                            // )
                             <Image
                                     src={profile.avatar_url}
                                     alt="dsa"

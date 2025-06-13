@@ -40,7 +40,42 @@ export default function AuthCallback() {
             sameSite: 'Lax'
           })
           
-          router.push(`/${locale}/`)
+          const isRegistrationIntent = sessionStorage.getItem('registration_intent')
+          const selectedRegionId = sessionStorage.getItem('selected_region_id')
+          
+          if (isRegistrationIntent === 'true') {
+            console.log('Handling registration flow for new user')
+            
+            try {
+              const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert({
+                  id: data.session.user.id,
+                  full_name: data.session.user.user_metadata?.full_name || data.session.user.user_metadata?.name || '',
+                  subscription_plan: 'free',
+                  region_id: selectedRegionId ? parseInt(selectedRegionId) : 1
+                }, {
+                  onConflict: 'id'
+                })
+
+              if (profileError) {
+                console.error('Profile creation error:', profileError)
+              }
+              
+              sessionStorage.removeItem('registration_intent')
+              sessionStorage.removeItem('selected_region_id')
+              
+              router.push(`/${locale}/auth/login?message=registration_success`)
+              
+            } catch (profileErr) {
+              console.error('Profile creation exception:', profileErr)
+              sessionStorage.removeItem('registration_intent')
+              sessionStorage.removeItem('selected_region_id')
+              router.push(`/${locale}/auth/login?message=registration_success`)
+            }
+          } else {
+            router.push(`/${locale}/`)
+          }
         } else {
           console.error('No session data returned from OAuth callback')
           router.push(`/${locale}/auth/login?error=no_session_data`)

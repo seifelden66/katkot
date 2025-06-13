@@ -518,7 +518,6 @@ export function useToggleReaction() {
       }
       
       if (previousReaction !== type) {
-        // Get post author to send notification
         const { data: postData } = await supabase
           .from('posts')
           .select('user_id')
@@ -535,7 +534,6 @@ export function useToggleReaction() {
           
         if (error) throw error;
         
-        // Create notification for post author if it's not the same user
         if (postData && postData.user_id !== userId) {
           await createNotification({
             userId: postData.user_id,
@@ -688,7 +686,6 @@ export function useFollowingList(userId: string | undefined) {
 }
 
 export function useCurrentUserProfile() {
-  // const queryClient = useQueryClient();
   
   return useQuery({
     queryKey: ['currentUserProfile'],
@@ -833,17 +830,14 @@ export function useUnreadNotificationsCount(userId: string | undefined) {
 export function useSearch(q: string) {
   return useQuery({
     queryKey: ['search', q],
-    // only run if the query is ≥ 2 chars
     enabled: q.trim().length >= 2,
     queryFn: async () => {
-      // —— USERS BY NAME ONLY ——
       const { data: users, error: usersError } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url')
         .ilike('full_name', `%${q}%`)
         .limit(5)
 
-      // —— POSTS AS-BEFORE ——
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`

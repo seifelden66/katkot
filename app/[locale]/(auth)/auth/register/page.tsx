@@ -1,17 +1,8 @@
 'use client'
 import Register from '@/components/Register'
-// import { useAuthRedirect } from '@/hooks/useAuthRedirect'
+import '../../../../globals.css'
 
 export default function RegisterPage() {
-  // const { isLoading } = useAuthRedirect('/')
-  
-  // if (isLoading) {
-  //   return (
-  //     <div className="max-w-md mx-auto py-12 px-4 flex justify-center">
-  //       <div className="animate-pulse">Loading...</div>
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className="max-w-md mx-auto py-12 px-4">

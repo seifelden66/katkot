@@ -1,4 +1,3 @@
-// app/not-found.tsx
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
