@@ -1,6 +1,5 @@
 'use client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { SunIcon, MoonIcon, MenuIcon, CloseIcon, SearchIcon } from '@/components/atoms/Icons'
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useEffect, useRef } from 'react';
@@ -37,25 +36,24 @@ interface SearchResults {
   posts: Post[];
 }
 
-export default function MobileHeader({ 
-  darkMode, 
-  setDarkMode, 
-  isMobileMenuOpen, 
-  setIsMobileMenuOpen 
+export default function MobileHeader({
+  darkMode,
+  setDarkMode,
+  isMobileMenuOpen,
+  setIsMobileMenuOpen
 }: MobileHeaderProps) {
   const locale = useLocale();
-  const router = useRouter();
   const t = useTranslations('sidebar.search');
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const { data: searchResults, isLoading: isSearching } = useSearch(debouncedQuery) as { 
-    data: SearchResults | undefined; 
-    isLoading: boolean 
+  const { data: searchResults, isLoading: isSearching } = useSearch(debouncedQuery) as {
+    data: SearchResults | undefined;
+    isLoading: boolean
   };
 
   useEffect(() => {
@@ -85,14 +83,12 @@ export default function MobileHeader({
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchQuery.trim().length >= 2) {
-      router.push(`/${locale}/search?q=${encodeURIComponent(searchQuery)}`);
-      setShowResults(false);
-      setShowSearchInput(false);
+      setShowResults(true)
+      setDebouncedQuery(searchQuery)
     }
-  };
-
+  }
   return (
     <header className="lg:hidden fixed top-0 left-0 right-0 z-40 border-b border-[hsl(var(--border))] px-4 py-3 flex justify-between items-center bg-[hsl(var(--background))]">
       {!showSearchInput ? (
@@ -115,7 +111,7 @@ export default function MobileHeader({
 
             <button
               onClick={(e) => {
-                e.stopPropagation(); 
+                e.stopPropagation();
                 setIsMobileMenuOpen(!isMobileMenuOpen);
               }}
               className="p-2 rounded-full bg-[hsl(var(--muted))]">

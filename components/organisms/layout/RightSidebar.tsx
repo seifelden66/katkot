@@ -11,7 +11,6 @@ import StoreFilter from '@/components/molecules/StoreFilter'
 import { SearchIcon } from '@/components/atoms/Icons'
 import { useUsersToFollow, useSearch } from '@/app/hooks/queries/usePostQueries'
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface User {
   id: string;
@@ -41,7 +40,6 @@ export default function RightSidebar() {
   const locale = useLocale()
   const t = useTranslations('sidebar.search')
   const queryClient = useQueryClient()
-  const router = useRouter()
   const currentUserId = session?.user?.id
 
   const [searchQuery, setSearchQuery] = useState('')
@@ -78,8 +76,8 @@ export default function RightSidebar() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim().length >= 2) {
-      router.push(`/${locale}/search?q=${encodeURIComponent(searchQuery)}`)
-      setShowResults(false)
+      setShowResults(true)
+      setDebouncedQuery(searchQuery)
     }
   }
 
