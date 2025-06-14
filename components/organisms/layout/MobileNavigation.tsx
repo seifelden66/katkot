@@ -8,8 +8,8 @@ import {
   NotificationIcon, 
   ProfileIcon, 
   CreateIcon 
-} from '@/components/icons/Icons'
-import NotificationBadge from '@/components/NotificationBadge'
+} from '@/components/atoms/Icons'
+import NotificationBadge from '@/components/molecules/NotificationBadge'
 
 export default function MobileNavigation() {
   const locale = useLocale();

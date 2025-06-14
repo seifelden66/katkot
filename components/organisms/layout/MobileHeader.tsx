@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { SunIcon, MoonIcon, MenuIcon, CloseIcon, SearchIcon } from '@/components/icons/Icons'
+import { SunIcon, MoonIcon, MenuIcon, CloseIcon, SearchIcon } from '@/components/atoms/Icons'
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useEffect, useRef } from 'react';
 import { useSearch } from '@/app/hooks/queries/usePostQueries';

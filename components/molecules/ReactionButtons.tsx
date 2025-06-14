@@ -1,10 +1,7 @@
-// import { useToggleReaction } from '@/app/hooks/queries/usePostQueries';
-// import { useSession } from '@/contexts/SessionContext'
 import { useToggleReaction } from '@/app/hooks/queries/usePostQueries';
-import { useSession } from '@/contexts/SessionContext';
-import { supabase } from '@/lib/supabaseClient';
+import { useSession } from '@/contexts/SessionContext'
 import { useEffect, useState } from 'react';
-// import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface ReactionButtonsProps {
   postId: string;

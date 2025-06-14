@@ -1,5 +1,6 @@
 'use client'
-import CreatePost from '@/components/CreatePost'
+
+import CreatePost from "@/components/organisms/CreatePost"
 
 export default function CreatePostPage() {
   return (

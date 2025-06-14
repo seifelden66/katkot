@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import Input from './atoms/Input'
-import Button from './atoms/Button'
+import Button from '../atoms/Button';
+import Input from '../atoms/Input';
 
 export default function Profile() {
   const [profile, setProfile] = useState<{

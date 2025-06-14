@@ -6,10 +6,10 @@ import { PointsProvider } from '@/contexts/PointsContext';
 import { useState, useEffect, useRef } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '@/lib/store';
-import MobileHeader from '@/components/layout/MobileHeader';
-import LeftSidebar from '@/components/layout/LeftSidebar';
-import RightSidebar from '@/components/layout/RightSidebar';
-import MobileNavigation from '@/components/layout/MobileNavigation';
+import MobileHeader from '@/components/organisms/layout/MobileHeader';
+import LeftSidebar from '@/components/organisms/layout/LeftSidebar';
+import RightSidebar from '@/components/organisms/layout/RightSidebar';
+import MobileNavigation from '@/components/organisms/layout/MobileNavigation';
 import { useLocale } from 'next-intl';
 import QueryProvider from '@/app/providers/QueryProvider';
 

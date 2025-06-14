@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Input from './atoms/Input';
-import Button from './atoms/Button';
+import Input from '../atoms/Input';
+import Button from '../atoms/Button';
 
 export default function Login() {
     const [email, setEmail] = useState('')

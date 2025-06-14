@@ -1,5 +1,5 @@
 'use client'
-import Register from '@/components/Register'
+import Register from '@/components/organisms/Register'
 import '../../../../globals.css'
 
 export default function RegisterPage() {

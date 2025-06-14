@@ -1,5 +1,5 @@
 'use client'
-import Login from '@/components/Login';
+import Login from '@/components/organisms/Login'
 import '../../../../globals.css'
 export default function LoginPage() {
 

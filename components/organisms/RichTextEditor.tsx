@@ -13,7 +13,7 @@ import {
   BulletListIcon, 
   ImageIcon, 
   YoutubeIcon 
-} from '@/components/icons/Icons'
+} from '@/components/atoms/Icons'
 
 interface MenuBarProps {
   editor: Editor | null;

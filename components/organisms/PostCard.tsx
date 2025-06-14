@@ -1,13 +1,13 @@
 'use client'
 import { useCallback } from 'react'
-import ReactionButtons from './molecules/ReactionButtons'
+import ReactionButtons from '../molecules/ReactionButtons'
 import { useSession } from '@/contexts/SessionContext'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { useAddComment } from '@/app/hooks/queries/usePostQueries';
-import { CommentIcon } from './atoms/Icons'
+import { CommentIcon } from '../atoms/Icons'
 
 interface Profile {
   avatar_url?: string;

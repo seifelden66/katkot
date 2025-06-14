@@ -2,12 +2,7 @@
 import { useSession } from '@/contexts/SessionContext'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+import { supabase } from '@/lib/supabaseClient'
 import { toast } from 'react-toastify'
 import Image from 'next/image'
 import Link from 'next/link'

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import UserGreeting from '@/components/UserGreeting'
+import UserGreeting from '@/components/molecules/UserGreeting'
 import { useSession } from '@/contexts/SessionContext'
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -13,8 +13,8 @@ import {
   CreateIcon, 
   SunIcon, 
   MoonIcon 
-} from '@/components/icons/Icons'
-import NotificationBadge from '../NotificationBadge';
+} from '@/components/atoms/Icons'
+import NotificationBadge from '@/components/molecules/NotificationBadge';
 
 
 type LeftSidebarProps = {

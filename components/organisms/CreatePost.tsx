@@ -8,8 +8,8 @@ import RichTextEditor from './RichTextEditor'
 import { toast } from 'react-toastify'
 import { useCategories, useRegions, useStores, useModifyPoints } from '@/app/hooks/queries/usePostQueries'
 import { usePoints } from '@/contexts/PointsContext'
-import Input from './atoms/Input'
-import Button from './atoms/Button'
+import Button from '../atoms/Button'
+import Input from '../atoms/Input'
 
 export default function CreatePost() {
   const locale = useLocale()

@@ -1,12 +1,12 @@
 'use client'
+import { supabase } from '@/lib/supabaseClient'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
+import Input from '../atoms/Input'
+import Button from '../atoms/Button'
 // import { useRegions } from '@/app/hooks/queries/usePostQueries'
-import Input from './atoms/Input'
-import Button from './atoms/Button'
-import { supabase } from '@/lib/supabaseClient'
 
 export default function Register() {
   const [email, setEmail] = useState('')
