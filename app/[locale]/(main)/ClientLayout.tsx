@@ -14,20 +14,21 @@ import { useLocale } from 'next-intl';
 import QueryProvider from '@/app/providers/QueryProvider';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const [darkMode, setDarkMode] = useState(false);
+  // Get initial theme from localStorage during component initialization
+  const initialTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+  const [darkMode, setDarkMode] = useState(initialTheme === 'dark');
+  
+  // Apply theme class immediately
+  if (typeof window !== 'undefined') {
+    document.documentElement.classList.toggle('dark', darkMode);
+  }
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const sidebarRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) setDarkMode(saved === 'dark');
-  }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 

@@ -1,10 +1,12 @@
 'use client'
 import Link from 'next/link'
-import { SunIcon, MoonIcon, MenuIcon, CloseIcon, SearchIcon } from '@/components/atoms/Icons'
+import {
+   MenuIcon, CloseIcon, SearchIcon } from '@/components/atoms/Icons'
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useEffect, useRef } from 'react';
 import { useSearch } from '@/app/hooks/queries/usePostQueries';
 import Image from 'next/image';
+import { ThemeToggle } from './LeftSidebar';
 
 type MobileHeaderProps = {
   darkMode: boolean;
@@ -103,11 +105,12 @@ export default function MobileHeader({
               className="p-2 rounded-full bg-[hsl(var(--muted))]">
               <SearchIcon />
             </button>
-            <button
+            {/* <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 rounded-full bg-[hsl(var(--muted))]">
               {darkMode ? <SunIcon /> : <MoonIcon />}
-            </button>
+            </button> */}
+            <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} label={{ light: 'Light', dark: 'Dark' }} />
 
             <button
               onClick={(e) => {
