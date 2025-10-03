@@ -1,9 +1,8 @@
-// app/layout.tsx
 import "./globals.css"
-import type { Metadata, Viewport } from "next"
+import type { Viewport } from "next"
 import ServiceWorkerManager from "./services/ServiceWorkerManager"
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Katkot - Affiliate Social Platform",
   description:
     "Katkot is not just a social media app – it's a platform where people share affiliate links, explore new products, and connect through content.",
@@ -37,6 +36,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favico.png",
     shortcut: "/favico.png",
+    manifest: '/manifest.webmanifest',
   },
 }
 
@@ -50,11 +50,7 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content", 
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
