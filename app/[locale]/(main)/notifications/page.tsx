@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSession } from '@/contexts/SessionContext'
 import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
@@ -33,6 +33,9 @@ export default function NotificationsPage() {
   const locale = useLocale()
   const t = useTranslations('notifications')
   
+  const [isSupported, setIsSupported] = useState(false)
+  const [subscription, setSubscription] = useState<PushSubscription | null>(null)
+  
   const { data: notifications = [], isLoading, refetch } = useNotifications(session?.user?.id)
   const markAsRead = useMarkNotificationsAsRead()
   const deleteNotification = useDeleteNotification()
@@ -49,65 +52,112 @@ export default function NotificationsPage() {
       markAsRead.mutate(unreadIds)
     }
   }, [unreadIds, markAsRead])
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      setIsSupported(true)
+      registerServiceWorker()
+    }
+  }, [])
     
   if (!session?.user?.id) {
-    return (
-      <div className="space-y-4 p-4">
-        sign in please
-      </div>
-    )
+    return <div className="space-y-4 p-4">sign in please</div>
+  }
+
+  function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+    const rawData = typeof window !== 'undefined' ? window.atob(base64) : ''
+    const outputArray = new Uint8Array(rawData.length)
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i)
+    }
+    return outputArray
+  }
+
+  async function registerServiceWorker() {
+    const registration = await navigator.serviceWorker.register('/sw.js', {
+      scope: '/',
+      updateViaCache: 'none',
+    })
+    const sub = await registration.pushManager.getSubscription()
+    setSubscription(sub)
+  }
+
+  async function subscribeToPush() {
+    if (!session?.user?.id) return
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      alert('Please allow notifications to subscribe')
+      return
+    }
+    const registration = await navigator.serviceWorker.ready
+    const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+    const sub = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+    })
+    setSubscription(sub)
+    const serializedSub = JSON.parse(JSON.stringify(sub))
+    await fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: session.user.id, subscription: serializedSub }),
+    })
+  }
+
+  async function unsubscribeFromPush() {
+    const endpoint = subscription?.endpoint
+    await subscription?.unsubscribe()
+    setSubscription(null)
+    if (session?.user?.id && endpoint) {
+      await fetch('/api/push/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: session.user.id, endpoint }),
+      })
+    }
   }
   
   const handleDeleteNotification = (id: number, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
     if (deleteNotification.isPending) return
-    
-    deleteNotification.mutate(id, {
-      onSuccess: () => {
-        refetch()
-      }
-    })
+    deleteNotification.mutate(id, { onSuccess: () => refetch() })
   }
   
   const handleDeleteAllNotifications = () => {
     if (deleteAllNotifications.isPending || notifications.length === 0) return
-    
-    deleteAllNotifications.mutate(session.user.id, {
-      onSuccess: () => {
-        refetch()
-      }
-    })
+    deleteAllNotifications.mutate(session.user.id, { onSuccess: () => refetch() })
   }
   
   const getNotificationContent = (notification: Notification) => {
     switch (notification.type) {
       case 'follow':
-        return `${notification.actor.full_name} started following you`;
+        return `${notification.actor.full_name} started following you`
       case 'like':
-        return `${notification.actor.full_name} liked your post`;
+        return `${notification.actor.full_name} liked your post`
       case 'comment':
-        return `${notification.actor.full_name} commented on your post`;
+        return `${notification.actor.full_name} commented on your post`
       case 'new_post':
-        return `${notification.actor.full_name} created a new post`;
+        return `${notification.actor.full_name} created a new post`
       default:
-        return `New notification from ${notification.actor.full_name}`;
+        return `New notification from ${notification.actor.full_name}`
     }
-  };
+  }
 
   const getNotificationLink = (notification: Notification) => {
     switch (notification.type) {
       case 'follow':
-        return `/${locale}/profile/${notification.actor.id}`;
+        return `/${locale}/profile/${notification.actor.id}`
       case 'like':
       case 'comment':
       case 'new_post':
-        return notification.post_id ? `/${locale}/posts/${notification.post_id}` : `/${locale}/profile/${notification.actor.id}`;
+        return notification.post_id ? `/${locale}/posts/${notification.post_id}` : `/${locale}/profile/${notification.actor.id}`
       default:
-        return `/${locale}/profile/${notification.actor.id}`;
+        return `/${locale}/profile/${notification.actor.id}`
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -124,9 +174,32 @@ export default function NotificationsPage() {
       </div>
     )
   }
-
+  
   return (
     <div className="space-y-1">
+      {isSupported && (
+        <div className="flex items-center justify-between p-3 mb-2 bg-gray-50 rounded">
+          <span className="text-sm text-gray-700">
+            {subscription ? 'Push notifications enabled' : 'Enable push notifications'}
+          </span>
+          {subscription ? (
+            <button
+              onClick={unsubscribeFromPush}
+              className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+            >
+              Unsubscribe
+            </button>
+          ) : (
+            <button
+              onClick={subscribeToPush}
+              className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Subscribe
+            </button>
+          )}
+        </div>
+      )}
+
       {notifications.length > 0 && (
         <div className="flex justify-end mb-2">
           <button 
