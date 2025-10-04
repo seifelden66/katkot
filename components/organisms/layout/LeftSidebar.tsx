@@ -5,15 +5,16 @@ import { useSession } from '@/contexts/SessionContext'
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'
+import Button from '@/components/atoms/Button';
 
-import { 
-  HomeIcon, 
-  ExploreIcon, 
-  NotificationIcon, 
-  ProfileIcon, 
-  CreateIcon, 
-  SunIcon, 
-  MoonIcon 
+import {
+  HomeIcon,
+  ExploreIcon,
+  NotificationIcon,
+  ProfileIcon,
+  CreateIcon,
+  SunIcon,
+  MoonIcon
 } from '@/components/atoms/Icons'
 import NotificationBadge from '@/components/molecules/NotificationBadge';
 
@@ -44,9 +45,10 @@ export function ThemeToggle({ darkMode, setDarkMode, label }: { darkMode: boolea
   if (!mounted) return null
 
   return (
-    <button
+    <Button
+      variant="secondary"
       onClick={() => setDarkMode(!darkMode)}
-      className="flex items-center px-4 py-2 text-sm text-[hsl(var(--foreground))] bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--accent))] rounded-full transition-colors shadow-sm"
+      className="flex items-center px-4 py-2 text-sm rounded-full shadow-sm"
     >
       {darkMode ? (
         <>
@@ -59,13 +61,13 @@ export function ThemeToggle({ darkMode, setDarkMode, label }: { darkMode: boolea
           <span className="ml-2">{label.dark}</span>
         </>
       )}
-    </button>
+    </Button>
   )
 }
 
 export default function LeftSidebar({ darkMode, setDarkMode, isMobileMenuOpen }: LeftSidebarProps) {
   const locale = useLocale();
-  const { session, signOut } = useSession()  
+  const { session, signOut } = useSession()
   const router = useRouter();
   const t = useTranslations('sidebar');
   const [mounted, setMounted] = useState(false)
@@ -85,9 +87,9 @@ export default function LeftSidebar({ darkMode, setDarkMode, isMobileMenuOpen }:
   return (
     <aside
       className={`fixed lg:sticky top-0 h-screen lg:flex w-72 border-r border-[hsl(var(--border))] z-30 transform transition-transform duration-300 ease-in-out bg-[hsl(var(--background))] flex flex-col
-      ${isRTL 
-        ? (isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0') 
-        : (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')}
+      ${isRTL
+          ? (isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0')
+          : (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')}
       ${isRTL ? 'right-0 lg:right-auto' : 'left-0 lg:left-auto'}`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
@@ -101,13 +103,13 @@ export default function LeftSidebar({ darkMode, setDarkMode, isMobileMenuOpen }:
             if (link.requiresAuth && !session) return null;
             const isCreatePost = link.name === 'Create Post';
             const isNotifications = link.name === 'Notifications';
-            
+
             return (
               <Link
                 key={index}
                 href={`/${locale}${link.href}`}
                 className={
-                  isCreatePost 
+                  isCreatePost
                     ? "flex items-center px-5 py-3 mt-6 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full transition-colors shadow-md"
                     : `flex items-center px-5 py-3 text-[hsl(var(--foreground))] rounded-full hover:bg-[hsl(var(--secondary))] transition-colors`
                 }
@@ -134,29 +136,29 @@ export default function LeftSidebar({ darkMode, setDarkMode, isMobileMenuOpen }:
                 setDarkMode={setDarkMode}
                 label={{ light: t('theme.light'), dark: t('theme.dark') }}
               />
-
-              <button
+              <Button
+                variant="primary"
                 onClick={toggleLanguage}
-                className="px-4 py-2 text-sm text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-full transition-colors shadow-sm"
+                className="px-4 py-2 text-sm shadow-sm"
               >
                 {locale === 'en' ? 'العربية' : 'English'}
-              </button>
+              </Button>
             </div>
-            
+
             <div className="flex items-center mt-3 justify-between">
               {session ? (
-                <button
+                <Button
+                  variant="primary"
                   onClick={signOut}
-                  className="px-4 py-2 text-sm text-white bg-red-400 hover:bg-red-500 rounded-full transition-colors shadow-sm"
+                  className="px-4 py-2 text-sm shadow-sm"
                 >
                   {t('auth.signOut')}
-                </button>
+                </Button>
               ) : (
-                <Link
-                  href={`/${locale}/auth/login`}
-                  className="px-4 py-2 text-sm text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-full transition-colors shadow-sm"
-                >
-                  {t('auth.signIn')}
+                <Link href={`/${locale}/auth/login`} passHref>
+                  <Button asChild variant="primary" className="px-4 py-2 text-sm shadow-sm">
+                    {t('auth.signIn')}
+                  </Button>
                 </Link>
               )}
             </div>

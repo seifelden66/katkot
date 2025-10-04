@@ -4,6 +4,7 @@ import { setSelectedCategory, clearFilters } from '@/lib/store'
 // import { useEffect } from 'react'
 import type { RootState } from '@/lib/store'
 import { useCategories } from '@/app/hooks/queries/usePostQueries'
+import Button from '@/components/atoms/Button';
 
 export default function CategoryFilter() {
   const dispatch = useDispatch()
@@ -22,38 +23,31 @@ export default function CategoryFilter() {
   return (
     <div className="w-full">
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           onClick={() => handleFilter(null)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-            selectedCategory === null && selectedStore === null
-              ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-sm'
-              : 'bg-gray-100  text-gray-700  hover:bg-gray-200 '
-          }`}
+          variant={selectedCategory === null && selectedStore === null ? "primary" : "outline"}
+          className="px-4 py-2 text-sm font-medium shadow-sm"
         >
           All
-        </button>
-        
+        </Button>
         {categories.map(category => (
-          <button
+          <Button
             key={category.id}
             onClick={() => handleFilter(category.id)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              selectedCategory === category.id
-                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-sm'
-                : 'bg-gray-100  text-gray-700  hover:bg-gray-200 '
-            }`}
+            variant={selectedCategory === category.id ? "primary" : "outline"}
+            className="px-4 py-2 text-sm font-medium shadow-sm"
           >
             {category.name}
-          </button>
+          </Button>
         ))}
-        
         {(selectedCategory !== null || selectedStore !== null) && (
-          <button
+          <Button
             onClick={handleClearFilters}
-            className="px-4 py-2 rounded-full text-sm font-medium transition-colors bg-red-100  text-red-600  hover:bg-red-200"
+            variant="primary"
+            className="px-4 py-2 text-sm font-medium shadow-sm"
           >
             Clear Filters
-          </button>
+          </Button>
         )}
       </div>
     </div>

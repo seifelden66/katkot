@@ -3,11 +3,12 @@ import { useCallback } from 'react'
 import ReactionButtons from './molecules/ReactionButtons'
 import { useSession } from '@/contexts/SessionContext'
 import Image from 'next/image'
-import { useLocale, useTranslations } from 'next-intl'
+import { useLocale, useTranslations,  } from 'next-intl'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { useAddComment } from '@/app/hooks/queries/usePostQueries';
 import { CommentIcon } from './atoms/Icons'
+import { useState } from 'react';
 
 interface Profile {
   avatar_url?: string;
@@ -56,11 +57,6 @@ interface PostCardProps {
   comments?: Comment[];
 }
 
-interface CommentItemProps {
-  comment: Comment;
-}
-
-
 interface PostCardProps {
   post: Post;
   comments?: Comment[];
@@ -100,32 +96,38 @@ export const ShimmerEffect = () => (
   </div>
 );
 
-const CommentItem = ({ comment }: CommentItemProps) => (
-  <div className="flex items-start gap-3 p-3 border-b border-gray-100  hover:bg-gray-50 transition-colors">
-    {comment.author?.avatar_url ? (
-      <Image
-        src={comment.author.avatar_url}
-        alt={`${comment.author.full_name}'s avatar`}
-        width={36}
-        height={36}
-        className="w-9 h-9 rounded-full object-cover"
-      />
-    ) : (
-      <div className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-        {comment.author?.full_name?.charAt(0) || '?'}
-      </div>
-    )}
+const CommentItem = ({ comment, onClick }: { comment: Comment; onClick?: () => void }) => {
+  const locale = useLocale();
+  return (
+  <div className="flex items-start gap-3 p-3 border-b border-gray-100" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+    <Link href={`/${locale}/profile/${comment.user_id}`}>
+      {comment.author?.avatar_url ? (
+        <Image
+          src={comment.author.avatar_url}
+          alt={`${comment.author.full_name}'s avatar`}
+          width={36}
+          height={36}
+          className="w-9 h-9 rounded-full object-cover"
+        />
+      ) : (
+        <div className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+          {comment.author?.full_name?.charAt(0) || '?'}
+        </div>
+      )}
+    </Link>
     <div className="flex-1">
       <div className="flex items-center gap-2">
-        <span className="font-medium ">{comment.profiles?.full_name}</span>
+        <Link href={`/profile/${comment.user_id}`} className="font-medium">
+          {comment.author?.full_name}
+        </Link>
         <span className="text-xs text-gray-500 ">
           {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
         </span>
       </div>
-      <p className="text-sm text-gray-800  mt-1">{comment.content}</p>
+      <p className="text-sm text-gray-800 mt-1">{comment.content}</p>
     </div>
   </div>
-);
+)};
 
 export default function PostCard({ post, comments = [], reactions = [] }: PostCardProps) {
   const { session } = useSession()  
@@ -150,6 +152,8 @@ export default function PostCard({ post, comments = [], reactions = [] }: PostCa
     ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
     : '';
 
+  const [showAllComments, setShowAllComments] = useState(false);
+  const displayedComments = showAllComments ? comments : comments.slice(0, 2);
   return (
     <div className="rounded-xl shadow-sm overflow-hidden mb-4">
       <div className="p-4">
@@ -221,12 +225,23 @@ export default function PostCard({ post, comments = [], reactions = [] }: PostCa
           <h4 className="font-medium mb-3">
             {t('comments')} ({comments.length})
           </h4>
-          
           <div className="space-y-1">
-            {comments.map(comment => (
-              <CommentItem key={comment.id} comment={comment} />
+            {displayedComments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                onClick={!showAllComments ? () => setShowAllComments(true) : undefined}
+              />
             ))}
           </div>
+          {comments.length > 2 && !showAllComments && (
+            <button
+              className="mt-2 px-4 py-2 rounded-full bg-gray-200 text-gray-800 text-sm font-medium"
+              onClick={() => setShowAllComments(true)}
+            >
+              See More
+            </button>
+          )}
           
           {session ? (
             <form 
